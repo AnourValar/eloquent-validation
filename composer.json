@@ -1,0 +1,18 @@
+{
+    "name": "anourvalar/eloquent-validation",
+    "description": "Validation feature for eloquent model (Laravel)",
+    "require": {
+        "php": ">=7.1.0",
+        "laravel/framework": ">=5.5.0"
+    },
+    "autoload": {
+        "psr-4": {"AnourValar\\EloquentValidation\\": "src/"}
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "AnourValar\\EloquentValidation\\App\\Providers\\AppServiceProvider"
+            ]
+        }
+    }
+}
