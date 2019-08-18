@@ -47,8 +47,8 @@ class AnourValarServiceProvider extends ServiceProvider
         
         
         // langs
-        $this->loadTranslationsFrom(__DIR__.'/../../resources/lang/', 'eloquent-validation');
-        $this->publishes([__DIR__.'/../../resources/lang/' => resource_path('lang/vendor/eloquent-validation')]);
+        $this->loadTranslationsFrom(__DIR__.'/../resources/lang/', 'eloquent-validation');
+        $this->publishes([__DIR__.'/../resources/lang/' => resource_path('lang/vendor/eloquent-validation')]);
         
         
         // commands

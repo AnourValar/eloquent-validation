@@ -25,7 +25,7 @@ class ModelMakeCommand extends \Illuminate\Foundation\Console\ModelMakeCommand
     protected function getStub()
     {
         if (!$this->option('pivot')) {
-            return __DIR__.'/../../../resources/model.stub';
+            return __DIR__.'/../../resources/model.stub';
         }
 
         return parent::getStub();
