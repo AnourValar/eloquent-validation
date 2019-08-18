@@ -1,10 +1,10 @@
 <?php
 
-namespace AnourValar\EloquentValidation\App\Providers;
+namespace AnourValar\EloquentValidation\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
-class AppServiceProvider extends ServiceProvider
+class AnourValarServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap any application services.
@@ -31,7 +31,7 @@ class AppServiceProvider extends ServiceProvider
         \Validator::extend('config', function ($attribute, $value, $parameters, $validator)
         {
             if (empty($parameters[0])) {
-                throw new \App\Exceptions\DevelopmentException('Parameter required for "config" rule!');
+                throw new \Exception('Parameter required for "config" rule!');
             }
             
             return isset(config($parameters[0])[$value]);
@@ -54,7 +54,7 @@ class AppServiceProvider extends ServiceProvider
         // commands
         if ($this->app->runningInConsole()) {
             $this->commands([
-                \AnourValar\EloquentValidation\App\Console\Commands\ModelMakeCommand::class,
+                \AnourValar\EloquentValidation\Console\Commands\ModelMakeCommand::class,
             ]);
         }
     }

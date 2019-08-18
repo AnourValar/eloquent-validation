@@ -1,8 +1,11 @@
 {
     "name": "anourvalar/eloquent-validation",
     "description": "Validation feature for eloquent model (Laravel)",
+    "keywords": ["laravel", "eloquent", "model", "validation", "validate", "validator", "anourvalar"],
+    "homepage": "https://github.com/AnourValar/eloquent-validation",
+    "license": "MIT",
     "require": {
-        "php": ">=7.1.0",
+        "php": ">=7.0.0",
         "laravel/framework": ">=5.5.0"
     },
     "autoload": {
@@ -11,7 +14,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "AnourValar\\EloquentValidation\\App\\Providers\\AppServiceProvider"
+                "AnourValar\\EloquentValidation\\Providers\\AnourValarServiceProvider"
             ]
         }
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace AnourValar\EloquentValidation\App\Console\Commands;
+namespace AnourValar\EloquentValidation\Console\Commands;
 
 class ModelMakeCommand extends \Illuminate\Foundation\Console\ModelMakeCommand
 {

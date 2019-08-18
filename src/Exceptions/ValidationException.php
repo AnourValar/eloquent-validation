@@ -1,6 +1,6 @@
 <?php
 
-namespace AnourValar\EloquentValidation\App\Exceptions;
+namespace AnourValar\EloquentValidation\Exceptions;
 
 class ValidationException extends \Illuminate\Validation\ValidationException
 {

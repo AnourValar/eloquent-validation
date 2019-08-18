@@ -1,6 +1,6 @@
 <?php
 
-namespace AnourValar\EloquentValidation\App\Traits;
+namespace AnourValar\EloquentValidation;
 
 trait ModelTrait
 {
@@ -123,7 +123,7 @@ trait ModelTrait
                 $validator = $errors;
             }
             
-            throw new \AnourValar\EloquentValidation\App\Exceptions\ValidationException($validator);
+            throw new \AnourValar\EloquentValidation\Exceptions\ValidationException($validator);
         }
         
         return $this;
@@ -196,7 +196,7 @@ trait ModelTrait
      * @param array $unchangeable
      * @param array $newAttributes
      * @param string $translate
-     * @throws \AnourValar\EloquentValidation\App\Exceptions\ValidationException
+     * @throws \AnourValar\EloquentValidation\Exceptions\ValidationException
      */
     protected function handleUnchangeable(
         array $unchangeable,
@@ -216,7 +216,7 @@ trait ModelTrait
                     $fieldName = $this->names[$fieldName];
                 }
                 
-                throw new \AnourValar\EloquentValidation\App\Exceptions\ValidationException([$name => trans($translate, ['name' => $fieldName])]);
+                throw new \AnourValar\EloquentValidation\Exceptions\ValidationException([$name => trans($translate, ['name' => $fieldName])]);
             }
         }
     }
@@ -225,7 +225,7 @@ trait ModelTrait
      * @param array $uniques
      * @param array $newAttributes
      * @param string $translate
-     * @throws \AnourValar\EloquentValidation\App\Exceptions\ValidationException
+     * @throws \AnourValar\EloquentValidation\Exceptions\ValidationException
      */
     protected function handleUnique(array $uniques, array $newAttributes, $translate = 'eloquent-validation::validation.unique')
     {
@@ -257,7 +257,7 @@ trait ModelTrait
                 }
                 $params['names'] = implode(', ', $params['names']);
                 
-                throw new \AnourValar\EloquentValidation\App\Exceptions\ValidationException([$field => trans($translate, $params)]);
+                throw new \AnourValar\EloquentValidation\Exceptions\ValidationException([$field => trans($translate, $params)]);
             }
         }
     }
