@@ -66,11 +66,11 @@ trait ModelTrait
      * Validation
      * 
      * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string $prefix
+     * @param mixed $prefix
      * @param array $additionalRules
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function scopeValidate(\Illuminate\Database\Eloquent\Builder $query, string $prefix = null, array $additionalRules = [])
+    public function scopeValidate(\Illuminate\Database\Eloquent\Builder $query, $prefix = null, array $additionalRules = [])
     {
         $this->fillNames();
         
@@ -93,7 +93,7 @@ trait ModelTrait
         
         // rules
         if ($passes) {
-            $validator = \Validator::make($this->attributes, $this->getCanonizedRules());
+            $validator = \Validator::make($this->attributes, $this->canonizeRules());
             if (isset($this->names)) {
                 $validator->setAttributeNames($this->names);
             }
@@ -115,6 +115,8 @@ trait ModelTrait
         
         if (!$passes) {
             if ($prefix) {
+                $prefix = $this->canonizePrefix($prefix);
+                
                 $errors = [];
                 foreach ($validator->errors()->messages() as $key => $error) {
                     $errors[$prefix.$key] = $error;
@@ -288,7 +290,7 @@ trait ModelTrait
     /**
      * @return array
      */
-    private function getCanonizedRules()
+    private function canonizeRules()
     {
         $rules = $this->rules ?? [];
         
@@ -333,5 +335,28 @@ trait ModelTrait
         unset($fieldRules);
         
         return $rules;
+    }
+    
+    /**
+     * @param mixed $prefix
+     * @return string
+     */
+    private function canonizePrefix($prefix)
+    {
+        if (is_iterable($prefix)) {
+            foreach ($prefix as $key => $item) {
+                if (!is_scalar($item) || !mb_strlen($item)) {
+                    unset($prefix[$key]);
+                }
+            }
+            
+            if ($prefix) {
+                $prefix = implode('.', $prefix) . '.';
+            } else {
+                $prefix = null;
+            }
+        }
+        
+        return $prefix;
     }
 }
