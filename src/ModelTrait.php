@@ -49,7 +49,7 @@ trait ModelTrait
             $value = null;
         }
         
-        if (isset($this->dates) && in_array($key, $this->dates) && $value) {
+        if (isset($value) && in_array($key, $this->getDates())) {
             if (! $value instanceof \Carbon\Carbon) {
                 if (!is_numeric($value)) {
                     $value = strtotime($value);
