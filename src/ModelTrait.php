@@ -218,7 +218,9 @@ trait ModelTrait
                     $fieldName = $this->names[$fieldName];
                 }
                 
-                throw new \AnourValar\EloquentValidation\Exceptions\ValidationException([$name => trans($translate, ['name' => $fieldName])]);
+                throw new \AnourValar\EloquentValidation\Exceptions\ValidationException(
+                    [$name => trans($translate, ['attribute' => $fieldName])]
+                );
             }
         }
     }
@@ -249,17 +251,19 @@ trait ModelTrait
             }
             
             if ($builder->first()) {
-                $params = ['names' => []];
+                $params = ['attributes' => []];
                 foreach ($unique as $field) {
                     if (isset($this->names[$field])) {
-                        $params['names'][] = $this->names[$field];
+                        $params['attributes'][] = $this->names[$field];
                     } else {
-                        $params['names'][] = $field;
+                        $params['attributes'][] = $field;
                     }
                 }
-                $params['names'] = implode(', ', $params['names']);
+                $params['attributes'] = implode(', ', $params['attributes']);
                 
-                throw new \AnourValar\EloquentValidation\Exceptions\ValidationException([$field => trans($translate, $params)]);
+                throw new \AnourValar\EloquentValidation\Exceptions\ValidationException(
+                    [$field => trans($translate, $params)]
+                );
             }
         }
     }
