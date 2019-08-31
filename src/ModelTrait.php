@@ -10,18 +10,18 @@ trait ModelTrait
     private static $fillableDynamic = [];
     
     /**
-     * Preliminary Validation Rules for All Attributes
+     * Base validation rules for all attributes
      * 
      * @var mixed
      */
-    protected $defaultRules = 'scalar';
+    private $defaultRules = 'scalar';
     
     /**
-     * Columns names
+     * Attribute names
      *
      * @var array
      */
-    protected $names = null;
+    private static $attributeNames;
     
     /**
      * @see \Validator::after()
@@ -72,21 +72,15 @@ trait ModelTrait
      */
     public function scopeValidate(\Illuminate\Database\Eloquent\Builder $query, $prefix = null, array $additionalRules = [])
     {
-        $this->fillNames();
-        
         // default rules
         $validator = \Validator::make($this->attributes, array_fill_keys(array_keys($this->attributes), $this->defaultRules));
-        if (isset($this->names)) {
-            $validator->setAttributeNames($this->names);
-        }
+        $validator->setAttributeNames($this->getAttributeNames());
         $passes = $validator->passes();
         
         // additional rules
         if ($passes && $additionalRules) {
             $validator = \Validator::make($this->attributes, $additionalRules);
-            if (isset($this->names)) {
-                $validator->setAttributeNames($this->names);
-            }
+            $validator->setAttributeNames($this->getAttributeNames());
             
             $passes = $validator->passes();
         }
@@ -94,9 +88,7 @@ trait ModelTrait
         // rules
         if ($passes) {
             $validator = \Validator::make($this->attributes, $this->canonizeRules());
-            if (isset($this->names)) {
-                $validator->setAttributeNames($this->names);
-            }
+            $validator->setAttributeNames($this->getAttributeNames());
             
             $passes = $validator->passes();
         }
@@ -104,9 +96,7 @@ trait ModelTrait
         // additional rules
         if ($passes) {
             $validator = \Validator::make($this->attributes, []);
-            if (isset($this->names)) {
-                $validator->setAttributeNames($this->names);
-            }
+            $validator->setAttributeNames($this->getAttributeNames());
             
             $validator->after([$this, 'afterValidation']);
             
@@ -195,6 +185,52 @@ trait ModelTrait
     }
     
     /**
+     * Set the attributes names
+     * 
+     * @param array $attributeNames
+     * @return void
+     */
+    public static function setAttributeNames(?array $attributeNames)
+    {
+        static::$attributeNames = &$attributeNames;
+    }
+    
+    /**
+     * Get the attributes names
+     * 
+     * @return array
+     */
+    public function getAttributeNames()
+    {
+        if (is_null(static::$attributeNames)) {
+            $attributeNames = [];
+            
+            if (\App::getLocale()) {
+                $path = explode('\\', get_class($this));
+                
+                $file = snake_case(array_pop($path));
+                
+                array_shift($path);
+                $path = array_map('snake_case', $path);
+                $dir = implode('/', $path);
+                
+                if (!$dir) {
+                    $dir = 'models';
+                }
+                
+                $attributeNames = trans($dir.'/'.$file.'.attributes');
+                if (! is_array($attributeNames)) {
+                    $attributeNames = [];
+                }
+            }
+            
+            static::$attributeNames = &$attributeNames;
+        }
+        
+        return static::$attributeNames;
+    }
+    
+    /**
      * @param array $unchangeable
      * @param array $newAttributes
      * @param string $translate
@@ -209,14 +245,11 @@ trait ModelTrait
             return;
         }
         
-        $this->fillNames();
+        $attributeNames = $this->getAttributeNames();
         
         foreach ($unchangeable as $name) {
             if (array_key_exists($name, $newAttributes) && !$this->originalIsEquivalent($name, $newAttributes[$name])) {
-                $fieldName = $name;
-                if (isset($this->names[$fieldName])) {
-                    $fieldName = $this->names[$fieldName];
-                }
+                $fieldName = $attributeNames[$name] ?? $name;
                 
                 throw new \AnourValar\EloquentValidation\Exceptions\ValidationException(
                     [$name => trans($translate, ['attribute' => $fieldName])]
@@ -233,7 +266,7 @@ trait ModelTrait
      */
     protected function handleUnique(array $uniques, array $newAttributes, $translate = 'eloquent-validation::validation.unique')
     {
-        $this->fillNames();
+        $attributeNames = $this->getAttributeNames();
         
         foreach ($uniques as $unique) {
             $builder = new $this;
@@ -250,43 +283,20 @@ trait ModelTrait
                 $builder = $builder->where($this->primaryKey, '!=', $newAttributes[$this->primaryKey]);
             }
             
+            if (in_array(\Illuminate\Database\Eloquent\SoftDeletes::class, class_uses($builder->getModel()))) {
+                $builder = $builder->withTrashed();
+            }
+            
             if ($builder->first()) {
                 $params = ['attributes' => []];
                 foreach ($unique as $field) {
-                    if (isset($this->names[$field])) {
-                        $params['attributes'][] = $this->names[$field];
-                    } else {
-                        $params['attributes'][] = $field;
-                    }
+                    $params['attributes'][] = $attributeNames[$field] ?? $field;
                 }
                 $params['attributes'] = implode(', ', $params['attributes']);
                 
                 throw new \AnourValar\EloquentValidation\Exceptions\ValidationException(
                     [$field => trans($translate, $params)]
                 );
-            }
-        }
-    }
-    
-    /**
-     * @return void
-     */
-    protected function fillNames()
-    {
-        if ($this->names !== null) {
-            return;
-        }
-        $this->names = [];
-        
-        if (\App::getLocale()) {
-            $file = get_class($this);
-            $file = explode('\\', $file);
-            $file = array_pop($file);
-            $file = snake_case($file);
-            
-            $names = trans('model/'.$file.'.fields');
-            if (is_array($names)) {
-                $this->names = $names;
             }
         }
     }

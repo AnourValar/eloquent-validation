@@ -4,7 +4,7 @@ namespace AnourValar\EloquentValidation\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
-class AnourValarServiceProvider extends ServiceProvider
+class EloquentValidationServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap any application services.

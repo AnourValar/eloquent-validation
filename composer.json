@@ -14,7 +14,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "AnourValar\\EloquentValidation\\Providers\\AnourValarServiceProvider"
+                "AnourValar\\EloquentValidation\\Providers\\EloquentValidationServiceProvider"
             ]
         }
     }
