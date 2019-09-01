@@ -9,7 +9,7 @@ class ModelMakeCommand extends \Illuminate\Foundation\Console\ModelMakeCommand
      *
      * @var string
      */
-    protected $name = 'make:model-validated';
+    protected $name = 'make:model-validation';
     
     /**
      * The console command description.

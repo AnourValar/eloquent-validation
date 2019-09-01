@@ -2,6 +2,8 @@
 
 namespace AnourValar\EloquentValidation;
 
+use \AnourValar\EloquentValidation\Exceptions\ValidationException;
+
 trait ModelTrait
 {
     /**
@@ -14,7 +16,7 @@ trait ModelTrait
      * 
      * @var mixed
      */
-    private $defaultRules = 'scalar';
+    private $baseRules = 'scalar';
     
     /**
      * Attribute names
@@ -24,11 +26,23 @@ trait ModelTrait
     private static $attributeNames;
     
     /**
-     * @see \Validator::after()
+     * "Save" after-validation
      * 
      * @param \Illuminate\Validation\Validator $validator
+     * @return void
      */
-    public function afterValidation(\Illuminate\Validation\Validator $validator)
+    public function saveValidation(\Illuminate\Validation\Validator $validator)
+    {
+        
+    }
+    
+    /**
+     * "Delete" after-validation
+     * 
+     * @param \Illuminate\Validation\Validator $validator
+     * @return void
+     */
+    public function deleteValidation(\Illuminate\Validation\Validator $validator)
     {
         
     }
@@ -50,7 +64,7 @@ trait ModelTrait
         }
         
         if (isset($value) && in_array($key, $this->getDates())) {
-            if (! is_object($value)) {
+            if (is_scalar($value)) {
                 if (!is_numeric($value)) {
                     $value = strtotime($value);
                 }
@@ -63,7 +77,7 @@ trait ModelTrait
     }
     
     /**
-     * Validation
+     * Save validation
      * 
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param mixed $prefix
@@ -72,12 +86,35 @@ trait ModelTrait
      */
     public function scopeValidate(\Illuminate\Database\Eloquent\Builder $query, $prefix = null, array $additionalRules = [])
     {
-        // default rules
-        $validator = \Validator::make($this->attributes, array_fill_keys(array_keys($this->attributes), $this->defaultRules));
+        // Base rules
+        $validator = \Validator::make($this->attributes, array_fill_keys(array_keys($this->attributes), $this->baseRules));
         $validator->setAttributeNames($this->getAttributeNames());
         $passes = $validator->passes();
         
-        // additional rules
+        // Handles
+        if ($passes) {
+            $validator = \Validator::make([], []);
+            $validator->setAttributeNames($this->getAttributeNames());
+            
+            $validator->after(function ($validator)
+            {
+                if (!empty($this->calculated)) {
+                    $this->handleUnchangeable($this->calculated, $validator, 'eloquent-validation::validation.calculated');
+                }
+                
+                if (!empty($this->unchangeable) && $this->exists) {
+                    $this->handleUnchangeable($this->unchangeable, $validator);
+                }
+                
+                if (!empty($this->unique)) {
+                    $this->handleUnique($this->unique, $validator);
+                }
+            });
+            
+            $passes = $validator->passes();
+        }
+        
+        // Additional rules
         if ($passes && $additionalRules) {
             $validator = \Validator::make($this->attributes, $additionalRules);
             $validator->setAttributeNames($this->getAttributeNames());
@@ -85,7 +122,7 @@ trait ModelTrait
             $passes = $validator->passes();
         }
         
-        // rules
+        // Rules
         if ($passes) {
             $validator = \Validator::make($this->attributes, $this->canonizeRules());
             $validator->setAttributeNames($this->getAttributeNames());
@@ -93,29 +130,55 @@ trait ModelTrait
             $passes = $validator->passes();
         }
         
-        // additional rules
+        // After validation
         if ($passes) {
             $validator = \Validator::make($this->attributes, []);
             $validator->setAttributeNames($this->getAttributeNames());
             
-            $validator->after([$this, 'afterValidation']);
+            $validator->after([$this, 'saveValidation']);
             
             $passes = $validator->passes();
         }
         
         if (!$passes) {
-            if ($prefix) {
-                $prefix = $this->canonizePrefix($prefix);
-                
-                $errors = [];
-                foreach ($validator->errors()->messages() as $key => $error) {
-                    $errors[$prefix.$key] = $error;
-                }
-                
-                $validator = $errors;
-            }
+            throw new ValidationException($validator, null, 'default', $prefix);
+        }
+        
+        return $this;
+    }
+    
+    /**
+     * Delete validation
+     * 
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $prefix
+     * @param array $additionalRules
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function scopeValidateDelete(\Illuminate\Database\Eloquent\Builder $query, $prefix = null, array $additionalRules = [])
+    {
+        $passes = true;
+        
+        // additional rules
+        if ($additionalRules) {
+            $validator = \Validator::make($this->attributes, $additionalRules);
+            $validator->setAttributeNames($this->getAttributeNames());
             
-            throw new \AnourValar\EloquentValidation\Exceptions\ValidationException($validator);
+            $passes = $validator->passes();
+        }
+        
+        // after validation
+        if ($passes) {
+            $validator = \Validator::make($this->attributes, []);
+            $validator->setAttributeNames($this->getAttributeNames());
+            
+            $validator->after([$this, 'deleteValidation']);
+            
+            $passes = $validator->passes();
+        }
+        
+        if (!$passes) {
+            throw new ValidationException($validator, null, 'default', $prefix);
         }
         
         return $this;
@@ -166,18 +229,6 @@ trait ModelTrait
      */
     public function save(array $options = [])
     {
-        if (!empty($this->calculated)) {
-            $this->handleUnchangeable($this->calculated, $this->getAttributes(), 'eloquent-validation::validation.calculated');
-        }
-        
-        if (!empty($this->unchangeable) && $this->exists) {
-            $this->handleUnchangeable($this->unchangeable, $this->getAttributes());
-        }
-        
-        if (!empty($this->unique)) {
-            $this->handleUnique($this->unique, $this->getAttributes());
-        }
-        
         $list = [];
         static::$fillableDynamic = &$list;
         
@@ -231,41 +282,46 @@ trait ModelTrait
     }
     
     /**
+     * Handle "unchangeable"
+     * 
      * @param array $unchangeable
-     * @param array $newAttributes
+     * @param \Illuminate\Validation\Validator $validator
      * @param string $translate
-     * @throws \AnourValar\EloquentValidation\Exceptions\ValidationException
      */
     protected function handleUnchangeable(
         array $unchangeable,
-        array $newAttributes,
+        \Illuminate\Validation\Validator &$validator,
         $translate = 'eloquent-validation::validation.unchangeable'
     ) {
         if ($this->isUnguarded()) {
             return;
         }
         
-        $attributeNames = $this->getAttributeNames();
+        $newAttributes = $this->attributes;
         
         foreach ($unchangeable as $name) {
             if (array_key_exists($name, $newAttributes) && !$this->originalIsEquivalent($name, $newAttributes[$name])) {
-                $fieldName = $attributeNames[$name] ?? $name;
-                
-                throw new \AnourValar\EloquentValidation\Exceptions\ValidationException(
-                    [$name => trans($translate, ['attribute' => $fieldName])]
+                $validator->errors()->add(
+                    $name,
+                    trans($translate, ['attribute' => ($validator->customAttributes[$name] ?? $name)])
                 );
             }
         }
     }
     
     /**
+     * Handle "unique"
+     * 
      * @param array $uniques
-     * @param array $newAttributes
+     * @param \Illuminate\Validation\Validator $validator
      * @param string $translate
-     * @throws \AnourValar\EloquentValidation\Exceptions\ValidationException
      */
-    protected function handleUnique(array $uniques, array $newAttributes, $translate = 'eloquent-validation::validation.unique')
-    {
+    protected function handleUnique(
+        array $uniques,
+        \Illuminate\Validation\Validator &$validator,
+        $translate = 'eloquent-validation::validation.unique'
+    ) {
+        $newAttributes = $this->attributes;
         $attributeNames = $this->getAttributeNames();
         
         foreach ($uniques as $unique) {
@@ -294,9 +350,7 @@ trait ModelTrait
                 }
                 $params['attributes'] = implode(', ', $params['attributes']);
                 
-                throw new \AnourValar\EloquentValidation\Exceptions\ValidationException(
-                    [$field => trans($translate, $params)]
-                );
+                $validator->errors()->add($field, trans($translate, $params));
             }
         }
     }
@@ -327,7 +381,9 @@ trait ModelTrait
                     }
                     
                     if (count($rule[1]) == 0) {
-                        $rule[1][] = $this->getConnectionName() ? $this->getConnectionName().'.'.$this->getTable() : $this->getTable();
+                        $rule[1][] = $this->getConnectionName() ?
+                            $this->getConnectionName().'.'.$this->getTable() :
+                            $this->getTable();
                     }
                     
                     if (count($rule[1]) == 1) {
@@ -349,28 +405,5 @@ trait ModelTrait
         unset($fieldRules);
         
         return $rules;
-    }
-    
-    /**
-     * @param mixed $prefix
-     * @return string
-     */
-    private function canonizePrefix($prefix)
-    {
-        if (is_iterable($prefix)) {
-            foreach ($prefix as $key => $item) {
-                if (!is_scalar($item) || !mb_strlen($item)) {
-                    unset($prefix[$key]);
-                }
-            }
-            
-            if ($prefix) {
-                $prefix = implode('.', $prefix) . '.';
-            } else {
-                $prefix = null;
-            }
-        }
-        
-        return $prefix;
     }
 }

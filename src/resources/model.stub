@@ -137,13 +137,25 @@ class DummyClass extends Model
     ];
     
     /**
-     * @see \Validator::after()
-     *
+     * "Save" after-validation
+     * 
      * @param \Illuminate\Validation\Validator $validator
+     * @return void
      */
-    public function afterValidation(\Illuminate\Validation\Validator $validator)
+    public function saveValidation(\Illuminate\Validation\Validator $validator)
     {
         //$data = $validator->getData();
-        //$validator->errors()->add('id', trans('model/DummyClass.id_not_exists'));
+        //$validator->errors()->add('id', trans('models/DummyClass.id_not_exists'));
+    }
+    
+    /**
+     * "Delete" after-validation
+     * 
+     * @param \Illuminate\Validation\Validator $validator
+     * @return void
+     */
+    public function deleteValidation(\Illuminate\Validation\Validator $validator)
+    {
+        
     }
 }

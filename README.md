@@ -30,7 +30,7 @@ Validation feature for eloquent model (Laravel)
 ## Generate model
 
 ```bash
-php artisan make:model-validated UserPhone
+php artisan make:model-validation UserPhone
 ```
 
 ## Model configuration
@@ -102,14 +102,26 @@ class UserPhone extends Model
     ];
     
     /**
-     * @see \Validator::after()
-     *
+     * "Save" after-validation
+     * 
      * @param \Illuminate\Validation\Validator $validator
+     * @return void
      */
-    public function afterValidation(\Illuminate\Validation\Validator $validator)
+    public function saveValidation(\Illuminate\Validation\Validator $validator)
     {
         if (!\App\User::find($this->user_id)) {
-            $validator->errors()->add('user_id', trans('model/user_phone.user_id_not_exists'));
+            $validator->errors()->add('user_id', trans('models/user_phone.user_id_not_exists'));
         }
+    }
+	
+    /**
+     * "Delete" after-validation
+     * 
+     * @param \Illuminate\Validation\Validator $validator
+     * @return void
+     */
+    public function deleteValidation(\Illuminate\Validation\Validator $validator)
+    {
+        
     }
 }

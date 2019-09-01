@@ -15,24 +15,61 @@ class ValidationException extends \Illuminate\Validation\ValidationException
      * @param mixed $errors
      * @param mixed $response
      * @param string $errorBag
+     * @param mixed $prefix
      */
-    public function __construct($errors, $response = null, $errorBag = 'default')
+    public function __construct($errors, $response = null, $errorBag = 'default', $prefix = null)
     {
+        $prefix = $this->canonizePrefix($prefix);
+        
         if ($errors instanceof \Illuminate\Validation\Validator) {
-            $validator = $errors;
+            if (is_null($prefix)) {
+                $validator = $errors;
+            } else {
+                $validator = \Validator::make([], []);
+                foreach ($errors->errors()->messages() as $key => $items) {
+                    foreach ((array)$items as $item) {
+                        $validator->errors()->add($prefix.$key, $item);
+                    }
+                }
+            }
         } else {
             if (is_scalar($errors)) {
                 $errors = ['error' => $errors];
             }
             
             $validator = \Validator::make([], []);
-            foreach ($errors as $key => $item) {
-                foreach ((array)$item as $sub) {
-                    $validator->errors()->add($key, $sub);
+            foreach ($errors as $key => $items) {
+                foreach ((array)$items as $item) {
+                    $validator->errors()->add($prefix.$key, $item);
                 }
             }
         }
         
         parent::__construct($validator, $response, $errorBag);
+    }
+
+    /**
+     * @param mixed $prefix
+     * @return string|NULL
+     */
+    protected function canonizePrefix($prefix)
+    {
+        if (! is_iterable($prefix)) {
+            return $prefix;
+        }
+        
+        foreach ($prefix as $key => $item) {
+            if (!is_scalar($item) || !mb_strlen($item)) {
+                unset($prefix[$key]);
+            }
+        }
+        
+        if ($prefix) {
+            $prefix = implode('.', $prefix) . '.';
+        } else {
+            $prefix = null;
+        }
+        
+        return $prefix;
     }
 }
