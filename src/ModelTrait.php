@@ -3,6 +3,7 @@
 namespace AnourValar\EloquentValidation;
 
 use \AnourValar\EloquentValidation\Exceptions\ValidationException;
+use Illuminate\Support\Str;
 
 trait ModelTrait
 {
@@ -140,7 +141,7 @@ trait ModelTrait
             $passes = $validator->passes();
         }
         
-        if (!$passes) {
+        if (! $passes) {
             throw new ValidationException($validator, null, 'default', $prefix);
         }
         
@@ -159,7 +160,7 @@ trait ModelTrait
     {
         $passes = true;
         
-        // additional rules
+        // Additional rules
         if ($additionalRules) {
             $validator = \Validator::make($this->attributes, $additionalRules);
             $validator->setAttributeNames($this->getAttributeNames());
@@ -167,7 +168,7 @@ trait ModelTrait
             $passes = $validator->passes();
         }
         
-        // after validation
+        // After validation
         if ($passes) {
             $validator = \Validator::make($this->attributes, []);
             $validator->setAttributeNames($this->getAttributeNames());
@@ -177,7 +178,7 @@ trait ModelTrait
             $passes = $validator->passes();
         }
         
-        if (!$passes) {
+        if (! $passes) {
             throw new ValidationException($validator, null, 'default', $prefix);
         }
         
@@ -259,10 +260,10 @@ trait ModelTrait
             if (\App::getLocale()) {
                 $path = explode('\\', get_class($this));
                 
-                $file = snake_case(array_pop($path));
+                $file = Str::snake(array_pop($path));
                 
                 array_shift($path);
-                $path = array_map('snake_case', $path);
+                $path = array_map([Str::class, 'snake'], $path);
                 $dir = implode('/', $path);
                 
                 if (!$dir) {
