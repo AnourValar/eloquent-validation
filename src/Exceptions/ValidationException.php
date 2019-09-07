@@ -10,7 +10,7 @@ class ValidationException extends \Illuminate\Validation\ValidationException
      * @var int
      */
     public $status = 400;
-    
+
     /**
      * @param mixed $errors
      * @param mixed $response
@@ -20,7 +20,7 @@ class ValidationException extends \Illuminate\Validation\ValidationException
     public function __construct($errors, $response = null, $errorBag = 'default', $prefix = null)
     {
         $prefix = $this->canonizePrefix($prefix);
-        
+
         if ($errors instanceof \Illuminate\Validation\Validator) {
             if (is_null($prefix)) {
                 $validator = $errors;
@@ -36,7 +36,7 @@ class ValidationException extends \Illuminate\Validation\ValidationException
             if (is_scalar($errors)) {
                 $errors = ['error' => $errors];
             }
-            
+
             $validator = \Validator::make([], []);
             foreach ($errors as $key => $items) {
                 foreach ((array)$items as $item) {
@@ -44,7 +44,7 @@ class ValidationException extends \Illuminate\Validation\ValidationException
                 }
             }
         }
-        
+
         parent::__construct($validator, $response, $errorBag);
     }
 
@@ -57,19 +57,19 @@ class ValidationException extends \Illuminate\Validation\ValidationException
         if (! is_iterable($prefix)) {
             return $prefix;
         }
-        
+
         foreach ($prefix as $key => $item) {
             if (!is_scalar($item) || !mb_strlen($item)) {
                 unset($prefix[$key]);
             }
         }
-        
+
         if ($prefix) {
             $prefix = implode('.', $prefix) . '.';
         } else {
             $prefix = null;
         }
-        
+
         return $prefix;
     }
 }
