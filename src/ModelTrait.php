@@ -10,7 +10,7 @@ trait ModelTrait
     /**
      * @var array
      */
-    private static $fillableDynamic = [];
+    protected static $fillableDynamic = [];
 
     /**
      * Base validation rules for all attributes
