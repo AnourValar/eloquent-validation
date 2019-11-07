@@ -137,8 +137,14 @@ trait ModelTrait
             $validator->setAttributeNames($this->getAttributeNames());
 
             $validator->after([$this, 'saveValidation']);
-
             $passes = $validator->passes();
+
+            if ($passes && $validator->getRules()) {
+                $validator = \Validator::make($this->attributes, $validator->getRules());
+                $validator->setAttributeNames($this->getAttributeNames());
+
+                $passes = $validator->passes();
+            }
         }
 
         if (! $passes) {
