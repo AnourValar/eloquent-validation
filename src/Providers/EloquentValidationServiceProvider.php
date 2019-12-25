@@ -46,6 +46,21 @@ class EloquentValidationServiceProvider extends ServiceProvider
         });
 
 
+        // "available_keys" validation
+         \Validator::extend('available_keys', function($attribute, $value, $parameters, $validator)
+        {
+            return ( is_array($value) && !array_diff_key($value, array_combine($parameters, $parameters)) );
+        });
+
+        \Validator::replacer('available_keys', function ($message, $attribute, $rule, $parameters, $validator)
+        {
+            return trans(
+                'eloquent-validation::validation.available_keys',
+                ['attribute' => $validator->getDisplayableAttribute($attribute)]
+            );
+        });
+
+
         // langs
         $this->loadTranslationsFrom(__DIR__.'/../resources/lang/', 'eloquent-validation');
         $this->publishes([__DIR__.'/../resources/lang/' => resource_path('lang/vendor/eloquent-validation')]);

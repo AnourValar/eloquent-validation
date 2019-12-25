@@ -140,8 +140,7 @@ trait ModelTrait
             $passes = $validator->passes();
 
             if ($passes && $validator->getRules()) {
-                $validator = \Validator::make($this->attributes, $validator->getRules());
-                $validator->setAttributeNames($this->getAttributeNames());
+                $validator = \Validator::make($validator->getData(), $validator->getRules(), [], $validator->customAttributes);
 
                 $passes = $validator->passes();
             }
