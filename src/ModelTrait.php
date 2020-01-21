@@ -13,18 +13,18 @@ trait ModelTrait
     protected static $fillableDynamic = [];
 
     /**
-     * Base validation rules for all attributes
+     * Raw validation rules for all attributes
      *
      * @var mixed
      */
-    private $baseRules = 'scalar';
+    private $rawRules = 'scalar';
 
     /**
      * Attribute names
      *
      * @var array
      */
-    private static $attributeNames;
+    protected static $attributeNames;
 
     /**
      * "Save" after-validation
@@ -82,15 +82,17 @@ trait ModelTrait
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param mixed $prefix
-     * @param array $additionalRules
+     * @param array $customRules
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function scopeValidate(\Illuminate\Database\Eloquent\Builder $query, $prefix = null, array $additionalRules = [])
+    public function scopeValidate(\Illuminate\Database\Eloquent\Builder $query, $prefix = null, array $customRules = [])
     {
-        // Base rules
-        $validator = \Validator::make($this->attributes, array_fill_keys(array_keys($this->attributes), $this->baseRules));
+        // Raw rules
+        $validator = \Validator::make($this->attributes, array_fill_keys(array_keys($this->attributes), $this->rawRules));
         $validator->setAttributeNames($this->getAttributeNames());
         $passes = $validator->passes();
+
+        $attributes = $this->getAttributesForValidation();
 
         // Handles
         if ($passes) {
@@ -115,9 +117,9 @@ trait ModelTrait
             $passes = $validator->passes();
         }
 
-        // Additional rules
-        if ($passes && $additionalRules) {
-            $validator = \Validator::make($this->attributes, $additionalRules);
+        // Custom rules
+        if ($passes && $customRules) {
+            $validator = \Validator::make($attributes, $customRules);
             $validator->setAttributeNames($this->getAttributeNames());
 
             $passes = $validator->passes();
@@ -125,7 +127,7 @@ trait ModelTrait
 
         // Rules
         if ($passes) {
-            $validator = \Validator::make($this->attributes, $this->canonizeRules());
+            $validator = \Validator::make($attributes, $this->canonizeRules());
             $validator->setAttributeNames($this->getAttributeNames());
 
             $passes = $validator->passes();
@@ -133,7 +135,7 @@ trait ModelTrait
 
         // After validation
         if ($passes) {
-            $validator = \Validator::make($this->attributes, []);
+            $validator = \Validator::make($attributes, []);
             $validator->setAttributeNames($this->getAttributeNames());
 
             $validator->after([$this, 'saveValidation']);
@@ -158,16 +160,17 @@ trait ModelTrait
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param mixed $prefix
-     * @param array $additionalRules
+     * @param array $customRules
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function scopeValidateDelete(\Illuminate\Database\Eloquent\Builder $query, $prefix = null, array $additionalRules = [])
+    public function scopeValidateDelete(\Illuminate\Database\Eloquent\Builder $query, $prefix = null, array $customRules = [])
     {
         $passes = true;
+        $attributes = $this->getAttributesForValidation();
 
-        // Additional rules
-        if ($additionalRules) {
-            $validator = \Validator::make($this->attributes, $additionalRules);
+        // Custom rules
+        if ($customRules) {
+            $validator = \Validator::make($attributes, $customRules);
             $validator->setAttributeNames($this->getAttributeNames());
 
             $passes = $validator->passes();
@@ -175,7 +178,7 @@ trait ModelTrait
 
         // After validation
         if ($passes) {
-            $validator = \Validator::make($this->attributes, []);
+            $validator = \Validator::make($attributes, []);
             $validator->setAttributeNames($this->getAttributeNames());
 
             $validator->after([$this, 'deleteValidation']);
@@ -364,7 +367,7 @@ trait ModelTrait
     /**
      * @return array
      */
-    private function canonizeRules()
+    protected function canonizeRules()
     {
         $rules = $this->rules ?? [];
 
@@ -411,5 +414,21 @@ trait ModelTrait
         unset($fieldRules);
 
         return $rules;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getAttributesForValidation()
+    {
+        $attributes = $this->attributes;
+
+        foreach (array_keys($attributes) as $name) {
+            if (isset($attributes[$name]) && $this->hasCast($name, ['json', 'array'])) {
+                $attributes[$name] = $this->$name;
+            }
+        }
+
+        return $attributes;
     }
 }
