@@ -96,7 +96,7 @@ trait ModelTrait
 
         // Handles
         if ($passes) {
-            $validator = \Validator::make([], []);
+            $validator = \Validator::make($attributes, []);
             $validator->setAttributeNames($this->getAttributeNames());
 
             $validator->after(function ($validator)
@@ -354,12 +354,17 @@ trait ModelTrait
 
             if ($builder->first()) {
                 $params = ['attributes' => []];
+                $key = null;
                 foreach ($unique as $field) {
                     $params['attributes'][] = $attributeNames[$field] ?? $field;
+
+                    if (! isset($key)) {
+                        $key = $field;
+                    }
                 }
                 $params['attributes'] = implode(', ', $params['attributes']);
 
-                $validator->errors()->add($field, trans($translate, $params));
+                $validator->errors()->add($key, trans($translate, $params));
             }
         }
     }
