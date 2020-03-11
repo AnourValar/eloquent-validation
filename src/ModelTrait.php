@@ -138,12 +138,19 @@ trait ModelTrait
             $validator = \Validator::make($attributes, []);
             $validator->setAttributeNames($this->getAttributeNames());
 
-            $validator->after([$this, 'saveValidation']);
+            $validator->after(function ()
+            {
+                static $triggered;
+
+                if (! $triggered) {
+                    $triggered = true;
+
+                    return call_user_func_array([$this, 'saveValidation'], func_get_args());
+                }
+            });
             $passes = $validator->passes();
 
             if ($passes && $validator->getRules()) {
-                $validator = \Validator::make($validator->getData(), $validator->getRules(), [], $validator->customAttributes);
-
                 $passes = $validator->passes();
             }
         }
