@@ -377,6 +377,52 @@ trait ModelTrait
     }
 
     /**
+     * Json Cast with convertation: '' => null
+     *
+     * @param mixed $data
+     * @return string|NULL
+     */
+    protected function jsonCastEmptyStringsToNull($data) : ?string
+    {
+        $data = $this->emptyStringsToNull($data);
+        if (is_null($data)) {
+            return null;
+        }
+
+        return $this->asJson($data);
+    }
+
+    /**
+     * @param mixed $data
+     * @return mixed
+     */
+    private function emptyStringsToNull($data)
+    {
+        if (is_null($data)) {
+            return null;
+        }
+
+        if (is_string($data) && trim($data) === '') {
+            return null;
+        }
+
+        if (is_scalar($data)) {
+            return $data;
+        }
+
+        if (! is_array($data)) {
+            return null;
+        }
+
+        foreach ($data as &$item) {
+            $item = $this->emptyStringsToNull($item);
+        }
+        unset($item);
+
+        return $data;
+    }
+
+    /**
      * @return array
      */
     protected function canonizeRules()
