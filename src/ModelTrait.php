@@ -60,7 +60,7 @@ trait ModelTrait
             $value = trim($value);
         }
 
-        if (isset($this->nullable) && in_array($key, $this->nullable) && $value === '') {
+        if (isset($this->nullable) && in_array($key, $this->nullable) && is_string($value) && trim($value) === '') {
             $value = null;
         }
 
