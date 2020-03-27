@@ -60,8 +60,12 @@ trait ModelTrait
             $value = trim($value);
         }
 
-        if (isset($this->nullable) && in_array($key, $this->nullable) && is_string($value) && trim($value) === '') {
-            $value = null;
+        if (isset($this->nullable) && in_array($key, $this->nullable)) {
+            if ((is_string($value) && trim($value) === '') ||
+                (is_array($value) && !count($value))
+            ) {
+                $value = null;
+            }
         }
 
         if (isset($value) && in_array($key, $this->getDates())) {
