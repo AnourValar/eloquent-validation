@@ -105,16 +105,16 @@ trait ModelTrait
 
             $validator->after(function ($validator)
             {
-                if (!empty($this->calculated)) {
-                    $this->handleUnchangeable($this->calculated, $validator, 'eloquent-validation::validation.calculated');
+                if ($this->getCalculated()) {
+                    $this->handleUnchangeable($this->getCalculated(), $validator, 'eloquent-validation::validation.calculated');
                 }
 
-                if (!empty($this->unchangeable) && $this->exists) {
-                    $this->handleUnchangeable($this->unchangeable, $validator);
+                if ($this->getUnchangeable() && $this->exists) {
+                    $this->handleUnchangeable($this->getUnchangeable(), $validator);
                 }
 
-                if (!empty($this->unique)) {
-                    $this->handleUnique($this->unique, $validator);
+                if ($this->getUnique()) {
+                    $this->handleUnique($this->getUnique(), $validator);
                 }
             });
 
@@ -299,6 +299,36 @@ trait ModelTrait
         }
 
         return static::$attributeNames;
+    }
+
+    /**
+     * Get calculated attributes
+     *
+     * @return array|NULL
+     */
+    public function getCalculated()
+    {
+        return ( $this->calculated ?? null );
+    }
+
+    /**
+     * Get unchangeable attributes
+     *
+     * @return array|NULL
+     */
+    public function getUnchangeable()
+    {
+        return ( $this->unchangeable ?? null );
+    }
+
+    /**
+     * Get unique attributes
+     *
+     * @return array|NULL
+     */
+    public function getUnique()
+    {
+        return ( $this->unique ?? null );
     }
 
     /**
