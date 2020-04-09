@@ -491,7 +491,7 @@ trait ModelTrait
                         $rule[1][] = $field;
                     }
 
-                    if (count($rule[1]) == 2 && $hasPrimary) {
+                    if (count($rule[1]) == 2 && $hasPrimary && $rule[1][1] != $this->primaryKey) {
                         $rule[1][] = $this->attributes[$this->primaryKey];
                         $rule[1][] = $this->primaryKey;
                     }
