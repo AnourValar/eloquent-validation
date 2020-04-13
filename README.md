@@ -1,6 +1,11 @@
-# Eloquent validation
+# Validation for Eloquent Models
 
-Validation feature for eloquent model (Laravel)
+## Installation
+
+```bash
+composer require anourvalar/eloquent-validation
+```
+
 
 ## Usage
 
@@ -15,6 +20,7 @@ Validation feature for eloquent model (Laravel)
 }
 ```
 
+
 ### Updating with validation
 
 ```php
@@ -27,11 +33,13 @@ Validation feature for eloquent model (Laravel)
 }
 ```
 
+
 ## Generate model
 
 ```bash
 php artisan make:model-validation UserPhone
 ```
+
 
 ## Model configuration
 
