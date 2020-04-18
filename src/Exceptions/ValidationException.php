@@ -16,10 +16,11 @@ class ValidationException extends \Illuminate\Validation\ValidationException
      * @param mixed $response
      * @param string $errorBag
      * @param mixed $prefix
+     * @param boolean $replaceKey
      */
-    public function __construct($errors, $response = null, $errorBag = 'default', $prefix = null)
+    public function __construct($errors, $response = null, $errorBag = 'default', $prefix = null, bool $replaceKey = false)
     {
-        $prefix = $this->canonizePrefix($prefix);
+        $prefix = $this->canonizePrefix($prefix, $replaceKey);
 
         if ($errors instanceof \Illuminate\Validation\Validator) {
             if (is_null($prefix)) {
@@ -27,6 +28,10 @@ class ValidationException extends \Illuminate\Validation\ValidationException
             } else {
                 $validator = \Validator::make([], []);
                 foreach ($errors->errors()->messages() as $key => $items) {
+                    if ($replaceKey && !is_null($prefix)) {
+                        $key = '';
+                    }
+
                     foreach ((array)$items as $item) {
                         $validator->errors()->add($prefix.$key, $item);
                     }
@@ -39,6 +44,10 @@ class ValidationException extends \Illuminate\Validation\ValidationException
 
             $validator = \Validator::make([], []);
             foreach ($errors as $key => $items) {
+                if ($replaceKey && !is_null($prefix)) {
+                    $key = '';
+                }
+
                 foreach ((array)$items as $item) {
                     $validator->errors()->add($prefix.$key, $item);
                 }
@@ -50,9 +59,10 @@ class ValidationException extends \Illuminate\Validation\ValidationException
 
     /**
      * @param mixed $prefix
+     * @param boolean $replaceKey
      * @return string|NULL
      */
-    protected function canonizePrefix($prefix)
+    protected function canonizePrefix($prefix, bool $replaceKey)
     {
         if (! is_iterable($prefix)) {
             return $prefix;
@@ -65,7 +75,11 @@ class ValidationException extends \Illuminate\Validation\ValidationException
         }
 
         if ($prefix) {
-            $prefix = implode('.', $prefix) . '.';
+            $prefix = implode('.', $prefix);
+
+            if (! $replaceKey) {
+                $prefix .= '.';
+            }
         } else {
             $prefix = null;
         }
