@@ -13,58 +13,14 @@ class EloquentValidationServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // "scalar" validation
-        \Validator::extend('scalar', function ($attribute, $value, $parameters, $validator)
-        {
-            return ( is_scalar($value) || is_null($value) || (is_object($value) && method_exists($value, '__toString')) );
-        });
-
-        \Validator::replacer('scalar', function ($message, $attribute, $rule, $parameters, $validator) {
-            return trans(
-                'eloquent-validation::validation.scalar',
-                ['attribute' => $validator->getDisplayableAttribute($attribute)]
-            );
-        });
-
-
-        // "config" validation
-        \Validator::extend('config', function ($attribute, $value, $parameters, $validator)
-        {
-            if (empty($parameters[0])) {
-                throw new \Exception('Parameter required for "config" rule!');
-            }
-
-            return (is_scalar($value) && isset(config($parameters[0])[$value]));
-        });
-
-        \Validator::replacer('config', function ($message, $attribute, $rule, $parameters, $validator)
-        {
-            return trans(
-                'eloquent-validation::validation.config',
-                ['attribute' => $validator->getDisplayableAttribute($attribute)]
-            );
-        });
-
-
-        // "available_keys" validation
-         \Validator::extend('available_keys', function($attribute, $value, $parameters, $validator)
-        {
-            return ( is_array($value) && !array_diff_key($value, array_combine($parameters, $parameters)) );
-        });
-
-        \Validator::replacer('available_keys', function ($message, $attribute, $rule, $parameters, $validator)
-        {
-            return trans(
-                'eloquent-validation::validation.available_keys',
-                ['attribute' => $validator->getDisplayableAttribute($attribute)]
-            );
-        });
-
+        // validation rules
+        $this->addScalarRule();
+        $this->addConfigRule();
+        $this->addAvailableKeysRule();
 
         // langs
         $this->loadTranslationsFrom(__DIR__.'/../resources/lang/', 'eloquent-validation');
         $this->publishes([__DIR__.'/../resources/lang/' => resource_path('lang/vendor/eloquent-validation')]);
-
 
         // commands
         if ($this->app->runningInConsole()) {
@@ -82,5 +38,65 @@ class EloquentValidationServiceProvider extends ServiceProvider
     public function register()
     {
 
+    }
+
+    /**
+     * @return void
+     */
+    private function addScalarRule() : void
+    {
+        \Validator::extend('scalar', function ($attribute, $value, $parameters, $validator)
+        {
+            return ( is_scalar($value) || is_null($value) || (is_object($value) && method_exists($value, '__toString')) );
+        });
+
+        \Validator::replacer('scalar', function ($message, $attribute, $rule, $parameters, $validator) {
+            return trans(
+                'eloquent-validation::validation.scalar',
+                ['attribute' => $validator->getDisplayableAttribute($attribute)]
+            );
+        });
+    }
+
+    /**
+     * @return void
+     */
+    private function addConfigRule() : void
+    {
+        \Validator::extend('config', function ($attribute, $value, $parameters, $validator)
+        {
+            if (empty($parameters[0])) {
+                throw new \LogicException('Parameter required for "config" rule!');
+            }
+
+            return (is_scalar($value) && isset(config($parameters[0])[$value]));
+        });
+
+        \Validator::replacer('config', function ($message, $attribute, $rule, $parameters, $validator)
+        {
+            return trans(
+                'eloquent-validation::validation.config',
+                ['attribute' => $validator->getDisplayableAttribute($attribute)]
+            );
+        });
+    }
+
+    /**
+     * @return void
+     */
+    private function addAvailableKeysRule() : void
+    {
+        \Validator::extend('available_keys', function($attribute, $value, $parameters, $validator)
+        {
+            return ( is_array($value) && !array_diff_key($value, array_combine($parameters, $parameters)) );
+        });
+
+        \Validator::replacer('available_keys', function ($message, $attribute, $rule, $parameters, $validator)
+        {
+            return trans(
+                'eloquent-validation::validation.available_keys',
+                ['attribute' => $validator->getDisplayableAttribute($attribute)]
+            );
+        });
     }
 }
