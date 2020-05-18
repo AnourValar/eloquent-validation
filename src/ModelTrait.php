@@ -56,16 +56,12 @@ trait ModelTrait
      */
     public function setAttribute($key, $value)
     {
-        if (isset($this->trim) && in_array($key, $this->trim) && is_scalar($value) && mb_strlen($value)) {
-            $value = trim($value);
+        if (isset($this->trim) && in_array($key, $this->trim)) {
+            $value = $this->setTrim($value);
         }
 
         if (isset($this->nullable) && in_array($key, $this->nullable)) {
-            if ((is_string($value) && trim($value) === '') ||
-                (is_array($value) && !count($value))
-            ) {
-                $value = null;
-            }
+            $value = $this->setNull($value);
         }
 
         if (isset($value) && in_array($key, $this->getDates())) {
@@ -522,5 +518,45 @@ trait ModelTrait
         }
 
         return $attributes;
+    }
+
+    /**
+     * @param mixed $value
+     * @return mixed
+     */
+    private function setTrim($value)
+    {
+        if (is_string($value)) {
+            return trim($value);
+        }
+
+        if (is_array($value)) {
+            foreach ($value as &$item) {
+                $item = $this->setTrim($item);
+            }
+            unset($item);
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param mixed $value
+     * @return mixed
+     */
+    private function setNull($value)
+    {
+        if ((is_string($value) && trim($value) === '') || (is_array($value) && !count($value))) {
+            return null;
+        }
+
+        if (is_array($value)) {
+            foreach ($value as &$item) {
+                $item = $this->setNull($item);
+            }
+            unset($item);
+        }
+
+        return $value;
     }
 }

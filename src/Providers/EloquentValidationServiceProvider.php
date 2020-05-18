@@ -69,7 +69,29 @@ class EloquentValidationServiceProvider extends ServiceProvider
                 throw new \LogicException('Parameter required for "config" rule!');
             }
 
-            return (is_scalar($value) && isset(config($parameters[0])[$value]));
+            if (is_scalar($value)) {
+                return isset(config($parameters[0])[$value]);
+            }
+
+            if (is_array($value)) {
+                foreach ($value as $item) {
+                    if (is_null($item) && !empty($parameters[1])) {
+                        continue;
+                    }
+
+                    if (!is_scalar($item) || !isset(config($parameters[0])[$item])) {
+                        return false;
+                    }
+                }
+
+                if (count($value) != count(array_unique($value))) {
+                    return false;
+                }
+
+                return true;
+            }
+
+            return false;
         });
 
         \Validator::replacer('config', function ($message, $attribute, $rule, $parameters, $validator)
