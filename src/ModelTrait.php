@@ -550,13 +550,6 @@ trait ModelTrait
             return null;
         }
 
-        if (is_array($value)) {
-            foreach ($value as &$item) {
-                $item = $this->setNull($item);
-            }
-            unset($item);
-        }
-
         return $value;
     }
 }
