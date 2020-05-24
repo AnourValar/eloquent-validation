@@ -108,15 +108,15 @@ class EloquentValidationServiceProvider extends ServiceProvider
      */
     private function addAvailableKeysRule() : void
     {
-        \Validator::extend('available_keys', function($attribute, $value, $parameters, $validator)
+        \Validator::extend('array_keys', function($attribute, $value, $parameters, $validator)
         {
             return ( is_array($value) && !array_diff_key($value, array_combine($parameters, $parameters)) );
         });
 
-        \Validator::replacer('available_keys', function ($message, $attribute, $rule, $parameters, $validator)
+        \Validator::replacer('array_keys', function ($message, $attribute, $rule, $parameters, $validator)
         {
             return trans(
-                'eloquent-validation::validation.available_keys',
+                'eloquent-validation::validation.array_keys',
                 ['attribute' => $validator->getDisplayableAttribute($attribute)]
             );
         });
