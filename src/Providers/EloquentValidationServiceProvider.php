@@ -110,6 +110,19 @@ class EloquentValidationServiceProvider extends ServiceProvider
     {
         \Validator::extend('array_keys', function($attribute, $value, $parameters, $validator)
         {
+            $attribute .= '.';
+            foreach (array_keys($validator->getRules()) as $item) {
+                if (strpos($item, $attribute) !== 0) {
+                    continue;
+                }
+
+                $item = substr($item, strlen($attribute));
+                $item = explode('.', $item, 2);
+
+                $parameters[] = $item[0];
+            }
+            $parameters = array_unique($parameters);
+
             return ( is_array($value) && !array_diff_key($value, array_combine($parameters, $parameters)) );
         });
 
