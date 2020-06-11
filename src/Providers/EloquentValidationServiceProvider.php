@@ -75,10 +75,6 @@ class EloquentValidationServiceProvider extends ServiceProvider
 
             if (is_array($value)) {
                 foreach ($value as $item) {
-                    if (is_null($item) && !empty($parameters[1])) {
-                        continue;
-                    }
-
                     if (!is_scalar($item) || !isset(config($parameters[0])[$item])) {
                         return false;
                     }
