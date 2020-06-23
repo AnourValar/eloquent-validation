@@ -17,6 +17,7 @@ class EloquentValidationServiceProvider extends ServiceProvider
         $this->addScalarRule();
         $this->addConfigRule();
         $this->addAvailableKeysRule();
+        $this->addNullableArray();
 
         // langs
         $this->loadTranslationsFrom(__DIR__.'/../resources/lang/', 'eloquent-validation');
@@ -126,6 +127,25 @@ class EloquentValidationServiceProvider extends ServiceProvider
         {
             return trans(
                 'eloquent-validation::validation.array_keys',
+                ['attribute' => $validator->getDisplayableAttribute($attribute)]
+            );
+        });
+    }
+
+    /**
+     * @return void
+     */
+    private function addNullableArray() : void
+    {
+        \Validator::extendImplicit('nullable_array', function ($attribute, $value, $parameters, $validator)
+        {
+            return (is_null($value) || is_array($value));
+        });
+
+        \Validator::replacer('nullable_array', function ($message, $attribute, $rule, $parameters, $validator)
+        {
+            return trans(
+                'eloquent-validation::validation.nullable_array',
                 ['attribute' => $validator->getDisplayableAttribute($attribute)]
             );
         });
