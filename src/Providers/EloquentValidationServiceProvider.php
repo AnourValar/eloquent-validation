@@ -17,7 +17,7 @@ class EloquentValidationServiceProvider extends ServiceProvider
         $this->addScalarRule();
         $this->addConfigRule();
         $this->addAvailableKeysRule();
-        $this->addNullableArray();
+        $this->addNotEmpty();
 
         // langs
         $this->loadTranslationsFrom(__DIR__.'/../resources/lang/', 'eloquent-validation');
@@ -135,17 +135,17 @@ class EloquentValidationServiceProvider extends ServiceProvider
     /**
      * @return void
      */
-    private function addNullableArray() : void
+    private function addNotEmpty() : void
     {
-        \Validator::extendImplicit('nullable_array', function ($attribute, $value, $parameters, $validator)
+        \Validator::extendImplicit('not_empty', function ($attribute, $value, $parameters, $validator)
         {
-            return (is_null($value) || is_array($value));
+            return $value !== '';
         });
 
-        \Validator::replacer('nullable_array', function ($message, $attribute, $rule, $parameters, $validator)
+        \Validator::replacer('not_empty', function ($message, $attribute, $rule, $parameters, $validator)
         {
             return trans(
-                'eloquent-validation::validation.nullable_array',
+                'eloquent-validation::validation.not_empty',
                 ['attribute' => $validator->getDisplayableAttribute($attribute)]
             );
         });

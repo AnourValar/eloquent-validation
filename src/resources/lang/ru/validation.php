@@ -4,7 +4,7 @@ return [
     'scalar' => 'Поле :attribute должно быть скалярной величиной.',
     'config' => 'Поле :attribute должно содержать значение из справочника.',
     'array_keys' => 'Поле :attribute может содержать ограниченный список ключей.',
-    'nullable_array' => 'Поле :attribute должно быть массивом.',
+    'not_empty' => 'Поле :attribute не может быть пустым.',
 
     'calculated' => 'Поле :attribute вычисляется автоматически.',
     'unchangeable' => 'Поле :attribute не может быть изменено.',
