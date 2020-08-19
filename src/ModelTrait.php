@@ -412,7 +412,7 @@ trait ModelTrait
      * @param mixed $data
      * @return string|NULL
      */
-    protected function jsonCastEmptyStringsToNull($data) : ?string
+    protected function jsonCastEmptyStringsToNull($data): ?string
     {
         $data = $this->emptyStringsToNull($data);
         if (is_null($data)) {

@@ -16,7 +16,8 @@ class EloquentValidationServiceProvider extends ServiceProvider
         // validation rules
         $this->addScalarRule();
         $this->addConfigRule();
-        $this->addAvailableKeysRule();
+        $this->addArrayKeysRule();
+        $this->addArrayKeysOnlyRule();
         $this->addNotEmpty();
 
         // langs
@@ -44,7 +45,7 @@ class EloquentValidationServiceProvider extends ServiceProvider
     /**
      * @return void
      */
-    private function addScalarRule() : void
+    private function addScalarRule(): void
     {
         \Validator::extend('scalar', function ($attribute, $value, $parameters, $validator)
         {
@@ -62,7 +63,7 @@ class EloquentValidationServiceProvider extends ServiceProvider
     /**
      * @return void
      */
-    private function addConfigRule() : void
+    private function addConfigRule(): void
     {
         \Validator::extend('config', function ($attribute, $value, $parameters, $validator)
         {
@@ -103,7 +104,7 @@ class EloquentValidationServiceProvider extends ServiceProvider
     /**
      * @return void
      */
-    private function addAvailableKeysRule() : void
+    private function addArrayKeysRule(): void
     {
         \Validator::extend('array_keys', function($attribute, $value, $parameters, $validator)
         {
@@ -135,7 +136,26 @@ class EloquentValidationServiceProvider extends ServiceProvider
     /**
      * @return void
      */
-    private function addNotEmpty() : void
+    private function addArrayKeysOnlyRule(): void
+    {
+        \Validator::extend('array_keys_only', function($attribute, $value, $parameters, $validator)
+        {
+            return ( is_array($value) && !array_diff_key($value, array_combine($parameters, $parameters)) );
+        });
+
+        \Validator::replacer('array_keys_only', function ($message, $attribute, $rule, $parameters, $validator)
+        {
+            return trans(
+                'eloquent-validation::validation.array_keys',
+                ['attribute' => $validator->getDisplayableAttribute($attribute)]
+            );
+        });
+    }
+
+    /**
+     * @return void
+     */
+    private function addNotEmpty(): void
     {
         \Validator::extendImplicit('not_empty', function ($attribute, $value, $parameters, $validator)
         {

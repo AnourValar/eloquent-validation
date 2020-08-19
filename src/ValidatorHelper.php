@@ -14,7 +14,7 @@ class ValidatorHelper
      * @throws \AnourValar\EloquentValidation\Exceptions\ValidationException
      * @return void
      */
-    public function afterValidate(\Illuminate\Validation\Validator $validator, callable $closure, $prefix = null) : void
+    public function afterValidate(\Illuminate\Validation\Validator $validator, callable $closure, $prefix = null): void
     {
         if ($validator->getRules()) {
             throw new \LogicException('Incorrect usage.');
