@@ -65,8 +65,8 @@ trait ModelTrait
         }
 
         if (isset($value) && in_array($key, $this->getDates())) {
-            if (is_scalar($value)) {
-                if (!is_numeric($value)) {
+            if (is_scalar($value) && mb_strlen($value)) {
+                if (! is_numeric($value)) {
                     $value = strtotime($value);
                 }
 
