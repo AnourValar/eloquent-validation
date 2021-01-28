@@ -58,6 +58,29 @@ class ValidationException extends \Illuminate\Validation\ValidationException
     }
 
     /**
+     * Add prefix to keys
+     *
+     * @param mixed $prefix
+     * @return \AnourValar\EloquentValidation\Exceptions\ValidationException
+     */
+    public function addPrefix($prefix): ValidationException
+    {
+        $prefix = $this->canonizePrefix($prefix, false);
+
+        $validator = \Validator::make([], []);
+
+        foreach ($this->validator->errors()->messages() as $key => $items) {
+            foreach ((array)$items as $item) {
+                $validator->errors()->add($prefix.$key, $item);
+            }
+        }
+
+        $this->validator = $validator;
+
+        return $this;
+    }
+
+    /**
      * @param mixed $prefix
      * @param boolean $replaceKey
      * @return string|NULL
