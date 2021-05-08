@@ -372,7 +372,7 @@ trait ModelTrait
             if (array_key_exists($name, $newAttributes) && !$this->originalIsEquivalent($name, $newAttributes[$name])) {
                 $validator->errors()->add(
                     $name,
-                    trans($translate, ['attribute' => ($validator->customAttributes[$name] ?? $name)])
+                    trans($translate, ['attribute' => $this->getAttributeDisplayName($name, $validator)])
                 );
             }
         }
@@ -391,7 +391,6 @@ trait ModelTrait
         $translate = 'eloquent-validation::validation.unique'
     ) {
         $newAttributes = $this->attributes;
-        $attributeNames = $this->getAttributeNames();
 
         foreach ($uniques as $unique) {
             $builder = new $this;
@@ -416,7 +415,7 @@ trait ModelTrait
                 $params = ['attributes' => []];
                 $key = null;
                 foreach ($unique as $field) {
-                    $params['attributes'][] = $attributeNames[$field] ?? $field;
+                    $params['attributes'][] = $this->getAttributeDisplayName($field, $validator);
 
                     if (! isset($key)) {
                         $key = $field;
@@ -443,6 +442,20 @@ trait ModelTrait
         }
 
         return $this->asJson($data);
+    }
+
+    /**
+     * @param string $attribute
+     * @param \Illuminate\Validation\Validator $validator
+     * @return string
+     */
+    private function getAttributeDisplayName(string $attribute, \Illuminate\Validation\Validator $validator): string
+    {
+        if (isset($validator->customAttributes[$attribute])) {
+            return $validator->customAttributes[$attribute];
+        }
+
+        return (trans('validation.attributes')[$attribute] ?? $attribute);
     }
 
     /**
