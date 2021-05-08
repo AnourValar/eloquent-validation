@@ -28,6 +28,7 @@ class EloquentValidationServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 \AnourValar\EloquentValidation\Console\Commands\ModelMakeCommand::class,
+                \AnourValar\EloquentValidation\Console\Commands\ModelValidateCommand::class,
             ]);
         }
     }

@@ -64,7 +64,7 @@ trait ModelTrait
             $value = $this->setNull($value);
         }
 
-        if (isset($value) && in_array($key, $this->getDates())) {
+        if (isset($value) && $this->hasCast($key, ['date', 'datetime', 'custom_datetime'])) {
             if (is_scalar($value) && mb_strlen($value)) {
                 if (! is_numeric($value)) {
                     $value = strtotime($value);
@@ -82,11 +82,21 @@ trait ModelTrait
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param mixed $prefix
-     * @param array $customRules
+     * @param array $additionalRules
+     * @param array $additionalAttributeNames
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function scopeValidate(\Illuminate\Database\Eloquent\Builder $query, $prefix = null, array $customRules = [])
-    {
+    public function scopeValidate(
+        \Illuminate\Database\Eloquent\Builder $query,
+        $prefix = null,
+        array $additionalRules = null,
+        array $additionalAttributeNames = null
+    ) {
+        if ($additionalAttributeNames) {
+            $defaultAttributeNames = $this->getAttributeNames();
+            $this->setAttributeNames(array_replace($defaultAttributeNames, $additionalAttributeNames));
+        }
+
         // Raw rules
         $validator = \Validator::make($this->attributes, array_fill_keys(array_keys($this->attributes), $this->rawRules));
         $validator->setAttributeNames($this->getAttributeNames());
@@ -117,17 +127,12 @@ trait ModelTrait
             $passes = $validator->passes();
         }
 
-        // Custom rules
-        if ($passes && $customRules) {
-            $validator = \Validator::make($attributes, $customRules);
-            $validator->setAttributeNames($this->getAttributeNames());
-
-            $passes = $validator->passes();
-        }
-
         // Rules
         if ($passes) {
             $validator = \Validator::make($attributes, $this->canonizeRules());
+            if ($additionalRules) {
+                $validator->addRules($additionalRules);
+            }
             $validator->setAttributeNames($this->getAttributeNames());
 
             $passes = $validator->passes();
@@ -155,6 +160,10 @@ trait ModelTrait
             }
         }
 
+        if ($additionalAttributeNames) {
+            $this->setAttributeNames($defaultAttributeNames);
+        }
+
         if (! $passes) {
             throw new ValidationException($validator, null, 'default', $prefix);
         }
@@ -167,17 +176,27 @@ trait ModelTrait
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param mixed $prefix
-     * @param array $customRules
+     * @param array $additionalRules
+     * @param array $additionalAttributeNames
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function scopeValidateDelete(\Illuminate\Database\Eloquent\Builder $query, $prefix = null, array $customRules = [])
-    {
+    public function scopeValidateDelete(
+        \Illuminate\Database\Eloquent\Builder $query,
+        $prefix = null,
+        array $additionalRules = null,
+        array $additionalAttributeNames = null
+    ) {
+        if ($additionalAttributeNames) {
+            $defaultAttributeNames = $this->getAttributeNames();
+            $this->setAttributeNames(array_replace($defaultAttributeNames, $additionalAttributeNames));
+        }
+
         $passes = true;
         $attributes = $this->getAttributesForValidation();
 
-        // Custom rules
-        if ($customRules) {
-            $validator = \Validator::make($attributes, $customRules);
+        // Additional rules
+        if ($additionalRules) {
+            $validator = \Validator::make($attributes, $additionalRules);
             $validator->setAttributeNames($this->getAttributeNames());
 
             $passes = $validator->passes();
@@ -191,6 +210,10 @@ trait ModelTrait
             $validator->after([$this, 'deleteValidation']);
 
             $passes = $validator->passes();
+        }
+
+        if ($additionalAttributeNames) {
+            $this->setAttributeNames($defaultAttributeNames);
         }
 
         if (! $passes) {
