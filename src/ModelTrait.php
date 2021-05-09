@@ -10,7 +10,7 @@ trait ModelTrait
     /**
      * @var array
      */
-    protected static $fillableDynamic = [];
+    private static $fillableDynamic = [];
 
     /**
      * Raw validation rules for all attributes
@@ -241,7 +241,7 @@ trait ModelTrait
             $args = $args[0];
         }
 
-        static::$fillableDynamic = &$args;
+        static::$fillableDynamic = $args;
 
         return $this;
     }
@@ -253,11 +253,11 @@ trait ModelTrait
      */
     public function getFillable()
     {
-        if (!static::$fillableDynamic) {
-            return parent::getFillable();
+        if (static::$fillableDynamic) {
+            return static::$fillableDynamic;
         }
 
-        return static::$fillableDynamic;
+        return parent::getFillable();
     }
 
     /**
@@ -268,8 +268,7 @@ trait ModelTrait
      */
     public function save(array $options = [])
     {
-        $list = [];
-        static::$fillableDynamic = &$list;
+        static::$fillableDynamic = [];
 
         return parent::save($options);
     }
