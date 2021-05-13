@@ -40,4 +40,25 @@ class ValidatorHelper
             throw new \AnourValar\EloquentValidation\Exceptions\ValidationException($validator, null, 'default', $prefix);
         }
     }
+
+    /**
+     * Check if value should be null
+     *
+     * @param mixed $value
+     * @return boolean
+     */
+    public function isEmpty($value): bool
+    {
+        if (is_array($value)) {
+            foreach ($value as $item) {
+                if (! $this->isEmpty($item)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return (is_null($value) || ((is_string($value) && trim($value) === '')));
+    }
 }

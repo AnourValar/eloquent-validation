@@ -61,7 +61,7 @@ trait ModelTrait
         }
 
         if (isset($this->nullable) && in_array($key, $this->nullable)) {
-            $value = $this->setNull($value);
+            $value = $this->beNullable($value);
         }
 
         if (isset($value) && $this->hasCast($key, ['date', 'datetime', 'custom_datetime'])) {
@@ -579,9 +579,9 @@ trait ModelTrait
      * @param mixed $value
      * @return mixed
      */
-    private function setNull($value)
+    private function beNullable($value)
     {
-        if ((is_string($value) && trim($value) === '') || (is_array($value) && !count($value))) {
+        if (\App::make(ValidatorHelper::class)->isEmpty($value)) {
             return null;
         }
 
