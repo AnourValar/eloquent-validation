@@ -581,7 +581,7 @@ trait ModelTrait
      */
     private function beNullable($value)
     {
-        if (\App::make(ValidatorHelper::class)->isEmpty($value)) {
+        if ((is_string($value) && trim($value) === '') || (is_array($value) && !count($value))) {
             return null;
         }
 
