@@ -101,7 +101,7 @@ class ModelValidateCommand extends Command
             }
 
             $class = $namespace . pathinfo($item, PATHINFO_FILENAME);
-            if (! in_array(\AnourValar\EloquentValidation\ModelTrait::class, class_uses((new $class)))) {
+            if (! in_array(\AnourValar\EloquentValidation\ModelTrait::class, $this->getTraits($class))) {
                 continue;
             }
 
@@ -133,5 +133,20 @@ class ModelValidateCommand extends Command
             dump( $e->validator->errors()->all(), $e->validator->getData() );
             throw $e;
         }
+    }
+
+    /**
+     * @param string $class
+     * @return array
+     */
+    protected function getTraits(string $class)
+    {
+        $traits = class_uses($class);
+
+        foreach (class_parents($class) as $parent) {
+            $traits = array_merge($traits, class_uses($parent));
+        }
+
+        return $traits;
     }
 }
