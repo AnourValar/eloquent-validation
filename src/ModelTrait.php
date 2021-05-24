@@ -394,6 +394,10 @@ trait ModelTrait
         foreach ($uniques as $unique) {
             $builder = new $this;
 
+            if (!$this->isDirty($unique) && $this->exists) {
+                continue;
+            }
+
             foreach ($unique as $field) {
                 if (isset($newAttributes[$field])) {
                     $builder = $builder->where($field, '=', $newAttributes[$field]);
