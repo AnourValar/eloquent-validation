@@ -27,6 +27,16 @@ trait ModelTrait
     protected static $attributeNames;
 
     /**
+     * Get the validation rules
+     *
+     * @return array
+     */
+    public function saveRules()
+    {
+        return [];
+    }
+
+    /**
      * "Save" after-validation
      *
      * @param \Illuminate\Validation\Validator $validator
