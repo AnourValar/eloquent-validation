@@ -32,7 +32,7 @@ trait ModelTrait
      * @param \Illuminate\Validation\Validator $validator
      * @return void
      */
-    public function saveValidation(\Illuminate\Validation\Validator $validator)
+    public function saveAfterValidation(\Illuminate\Validation\Validator $validator)
     {
 
     }
@@ -43,7 +43,7 @@ trait ModelTrait
      * @param \Illuminate\Validation\Validator $validator
      * @return void
      */
-    public function deleteValidation(\Illuminate\Validation\Validator $validator)
+    public function deleteAfterValidation(\Illuminate\Validation\Validator $validator)
     {
 
     }
@@ -129,7 +129,7 @@ trait ModelTrait
 
         // Rules
         if ($passes) {
-            $validator = \Validator::make($attributes, $this->canonizeRules());
+            $validator = \Validator::make($attributes, $this->canonizedRules());
             if ($additionalRules) {
                 $validator->addRules($additionalRules);
             }
@@ -150,7 +150,7 @@ trait ModelTrait
                 if (! $triggered) {
                     $triggered = true;
 
-                    return call_user_func_array([$this, 'saveValidation'], func_get_args());
+                    return call_user_func_array([$this, 'saveAfterValidation'], func_get_args());
                 }
             });
             $passes = $validator->passes();
@@ -207,7 +207,7 @@ trait ModelTrait
             $validator = \Validator::make($attributes, []);
             $validator->setAttributeNames($this->getAttributeNames());
 
-            $validator->after([$this, 'deleteValidation']);
+            $validator->after([$this, 'deleteAfterValidation']);
 
             $passes = $validator->passes();
         }
@@ -494,19 +494,27 @@ trait ModelTrait
     /**
      * @return array
      */
-    protected function canonizeRules()
+    protected function canonizedRules()
     {
-        $rules = $this->rules ?? [];
+        $rules = $this->saveRules();
 
         // "unique" validation
         $hasPrimary = ($this->primaryKey && isset($this->attributes[$this->primaryKey]));
 
         foreach ($rules as $field => &$fieldRules) {
-            if (! is_array($fieldRules)) {
+            if (is_string($fieldRules)) {
                 $fieldRules = explode('|', $fieldRules);
             }
 
+            if (! is_iterable($fieldRules)) {
+                continue;
+            }
+
             foreach ($fieldRules as $key => $rule) {
+                if (! is_string($rule)) {
+                    continue;
+                }
+
                 $rule = explode(':', $rule, 2);
 
                 if (mb_strtolower($rule[0]) == 'unique') {

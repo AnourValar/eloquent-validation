@@ -46,15 +46,6 @@ class DummyClass extends Model
     public $timestamps = true;
 
     /**
-     * Validation rules
-     *
-     * @var array
-     */
-    protected $rules = [
-
-    ];
-
-    /**
      * Trim columns
      *
      * @var array
@@ -130,12 +121,24 @@ class DummyClass extends Model
     ];
 
     /**
+     * Get the validation rules
+     *
+     * @return array
+     */
+    public function saveRules()
+    {
+        return [
+
+        ];
+    }
+
+    /**
      * "Save" after-validation
      *
      * @param \Illuminate\Validation\Validator $validator
      * @return void
      */
-    public function saveValidation(\Illuminate\Validation\Validator $validator)
+    public function saveAfterValidation(\Illuminate\Validation\Validator $validator)
     {
         //$data = $validator->getData();
         //$validator->errors()->add('id', trans('models/DummyClass.id_not_exists'));
@@ -147,7 +150,7 @@ class DummyClass extends Model
      * @param \Illuminate\Validation\Validator $validator
      * @return void
      */
-    public function deleteValidation(\Illuminate\Validation\Validator $validator)
+    public function deleteAfterValidation(\Illuminate\Validation\Validator $validator)
     {
 
     }
