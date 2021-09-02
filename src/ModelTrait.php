@@ -71,17 +71,7 @@ trait ModelTrait
         }
 
         if (isset($this->nullable) && in_array($key, $this->nullable)) {
-            $value = $this->beNullable($value);
-        }
-
-        if (isset($value) && $this->hasCast($key, ['date', 'datetime', 'custom_datetime'])) {
-            if (is_scalar($value) && mb_strlen($value)) {
-                if (! is_numeric($value)) {
-                    $value = strtotime($value);
-                }
-
-                $value = date($this->getDateFormat(), $value);
-            }
+            $value = $this->setNull($value);
         }
 
         return parent::setAttribute($key, $value);
@@ -569,8 +559,10 @@ trait ModelTrait
         $attributes = $this->attributes;
 
         foreach (array_keys($attributes) as $name) {
-            if (isset($attributes[$name]) && $this->hasCast($name, ['json', 'array'])) {
-                $attributes[$name] = $this->$name;
+            $value = $this->getAttribute($name);
+
+            if (is_array($value)) {
+                $attributes[$name] = $value;
             }
         }
 
@@ -601,7 +593,7 @@ trait ModelTrait
      * @param mixed $value
      * @return mixed
      */
-    private function beNullable($value)
+    private function setNull($value)
     {
         if ((is_string($value) && trim($value) === '') || (is_array($value) && !count($value))) {
             return null;

@@ -5,13 +5,6 @@ namespace AnourValar\EloquentValidation\Exceptions;
 class ValidationException extends \Illuminate\Validation\ValidationException
 {
     /**
-     * The status code to use for the response.
-     *
-     * @var int
-     */
-    public $status = 400;
-
-    /**
      * @param mixed $errors
      * @param mixed $response
      * @param string $errorBag
