@@ -102,10 +102,10 @@ trait ModelTrait
         $validator->setAttributeNames($this->getAttributeNames());
         $passes = $validator->passes();
 
-        $attributes = $this->getAttributesForValidation();
-
         // Handles
         if ($passes) {
+            $attributes = $this->getAttributesForValidation();
+
             $validator = \Validator::make($attributes, []);
             $validator->setAttributeNames($this->getAttributeNames());
 
