@@ -11,7 +11,7 @@ class ModelValidateCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'model:validate {--dirty}';
+    protected $signature = 'model:validate {--dirty} {--ignore-configuration}';
 
     /**
      * The console command description.
@@ -54,6 +54,10 @@ class ModelValidateCommand extends Command
 
         foreach ($models as $model) {
             $bar->setMessage($model);
+
+            if (! $this->option('ignore-configuration')) {
+                $this->checkConfiguration(new $model);
+            }
 
             foreach ($model::all() as $item) {
                 if ($this->option('dirty')) {
@@ -148,5 +152,47 @@ class ModelValidateCommand extends Command
         }
 
         return $traits;
+    }
+
+    /**
+     * @param \Illuminate\Database\Eloquent\Model $model
+     * @throws \LogicException
+     * @return void
+     */
+    protected function checkConfiguration(\Illuminate\Database\Eloquent\Model $model): void
+    {
+        $collection = [];
+
+        foreach ($model->extractAttributesListFromConfiguration() as $name => $value) {
+            if ($name == 'unique') {
+
+                    $flat = [];
+                    foreach ($value as &$batch) {
+                        sort($batch);
+                        $flat = array_merge($flat, $batch);
+                    }
+                    unset($batch);
+
+                    if (count($value) != count(array_unique($value, SORT_REGULAR))) {
+                        throw new \LogicException("Duplicates for \"$name\"");
+                    }
+
+                    $collection = array_merge($collection, $flat);
+
+            } else {
+
+                if (count($value) != count(array_unique($value, SORT_REGULAR))) {
+                    throw new \LogicException("Duplicates for \"$name\": " . implode(', ', $value));
+                }
+
+                $collection = array_merge($collection, $value);
+
+            }
+        }
+
+        $diff = array_diff($collection, array_keys($model->getCasts()));
+        if ($diff) {
+            throw new \LogicException('Unpresent attributes in casts: ' . implode(', ', $diff));
+        }
     }
 }

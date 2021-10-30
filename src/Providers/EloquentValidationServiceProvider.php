@@ -7,6 +7,16 @@ use Illuminate\Support\ServiceProvider;
 class EloquentValidationServiceProvider extends ServiceProvider
 {
     /**
+     * Register any application services.
+     *
+     * @return void
+     */
+    public function register()
+    {
+
+    }
+
+    /**
      * Bootstrap any application services.
      *
      * @return void
@@ -31,16 +41,6 @@ class EloquentValidationServiceProvider extends ServiceProvider
                 \AnourValar\EloquentValidation\Console\Commands\ModelValidateCommand::class,
             ]);
         }
-    }
-
-    /**
-     * Register any application services.
-     *
-     * @return void
-     */
-    public function register()
-    {
-
     }
 
     /**
@@ -107,7 +107,7 @@ class EloquentValidationServiceProvider extends ServiceProvider
      */
     private function addArrayKeysRule(): void
     {
-        \Validator::extend('array_keys', function($attribute, $value, $parameters, $validator)
+        \Validator::extend('array_keys', function ($attribute, $value, $parameters, $validator)
         {
             $attribute .= '.';
             foreach (array_keys($validator->getRules()) as $item) {
@@ -139,7 +139,7 @@ class EloquentValidationServiceProvider extends ServiceProvider
      */
     private function addArrayKeysOnlyRule(): void
     {
-        \Validator::extend('array_keys_only', function($attribute, $value, $parameters, $validator)
+        \Validator::extend('array_keys_only', function ($attribute, $value, $parameters, $validator)
         {
             return ( is_array($value) && !array_diff_key($value, array_combine($parameters, $parameters)) );
         });

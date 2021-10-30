@@ -570,6 +570,30 @@ trait ModelTrait
     }
 
     /**
+     * @return array
+     */
+    public function extractAttributesListFromConfiguration(): array
+    {
+        $attributes = [
+            'trim' => (array) ($this->trim ?? null),
+            'nullable' => (array) ($this->nullable ?? null),
+            'hidden' => (array) ($this->hidden ?? null),
+            'attributes' => array_keys($this->attributes),
+            'calculated' => (array) ($this->calculated ?? null),
+            'unchangeable' => (array) ($this->unchangeable ?? null),
+            'unique' => (array) ($this->unique ?? null),
+        ];
+
+        foreach (array_keys($this->saveRules()) as $attribute) {
+            if (strpos($attribute, '.') === false) {
+                $attributes['save_rules'][] = $attribute;
+            }
+        }
+
+        return $attributes;
+    }
+
+    /**
      * @param mixed $value
      * @return mixed
      */
