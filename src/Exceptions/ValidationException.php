@@ -25,7 +25,7 @@ class ValidationException extends \Illuminate\Validation\ValidationException
                         $key = '';
                     }
 
-                    foreach ((array)$items as $item) {
+                    foreach ((array) $items as $item) {
                         $validator->errors()->add($prefix.$key, $item);
                     }
                 }
@@ -41,7 +41,7 @@ class ValidationException extends \Illuminate\Validation\ValidationException
                     $key = '';
                 }
 
-                foreach ((array)$items as $item) {
+                foreach ((array) $items as $item) {
                     $validator->errors()->add($prefix.$key, $item);
                 }
             }
@@ -63,7 +63,7 @@ class ValidationException extends \Illuminate\Validation\ValidationException
         $validator = \Validator::make([], []);
 
         foreach ($this->validator->errors()->messages() as $key => $items) {
-            foreach ((array)$items as $item) {
+            foreach ((array) $items as $item) {
                 $validator->errors()->add($prefix.$key, $item);
             }
         }

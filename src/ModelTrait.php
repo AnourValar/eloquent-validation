@@ -22,7 +22,7 @@ trait ModelTrait
     /**
      * Attribute names
      *
-     * @var array
+     * @var array|null
      */
     protected static $attributeNames;
 
@@ -537,6 +537,11 @@ trait ModelTrait
                     if (count($rule[1]) == 2 && $hasPrimary && $rule[1][1] != $this->primaryKey) {
                         $rule[1][] = $this->attributes[$this->primaryKey];
                         $rule[1][] = $this->primaryKey;
+                    }
+
+                    if (! $this->isDirty($rule[1][1])) {
+                        unset($fieldRules[$key]);
+                        continue;
                     }
 
                     $rule[1] = implode(',', $rule[1]);
