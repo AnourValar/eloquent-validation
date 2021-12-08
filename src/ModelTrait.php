@@ -8,11 +8,6 @@ use Illuminate\Support\Str;
 trait ModelTrait
 {
     /**
-     * @var array
-     */
-    private static $fillableDynamic = [];
-
-    /**
      * Raw validation rules for all attributes
      *
      * @var mixed
@@ -224,9 +219,9 @@ trait ModelTrait
     }
 
     /**
-     * Temporary (for one query) list of "fillables" columns
+     * Scope-access for "fillable"
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return static
      */
     public function scopeFields()
     {
@@ -241,36 +236,59 @@ trait ModelTrait
             $args = $args[0];
         }
 
-        static::$fillableDynamic = $args;
+        $this->fillable = $args;
 
         return $this;
     }
 
     /**
-     * @see \Illuminate\Database\Eloquent\Model::getFillable()
+     * Scope-access for "visible" & "appends"
      *
-     * @return array
+     * @return void
      */
-    public function getFillable()
+    public function scopePublishFields()
     {
-        if (static::$fillableDynamic) {
-            return static::$fillableDynamic;
+        $args = func_get_args();
+        array_shift($args);
+
+        if (!isset($args[0])) {
+            $args[0] = [];
         }
 
-        return parent::getFillable();
+        if (is_array($args[0])) {
+            $args = $args[0];
+        }
+
+        $this->visible = $args;
+
+        $this->appends = [];
+        foreach ($args as $arg) {
+            if ($this->hasGetMutator($arg)) {
+                $this->appends[] = $arg;
+            }
+        }
     }
 
     /**
-     * @see \Illuminate\Database\Eloquent\Model::save()
+     * @see \Illuminate\Database\Eloquent\Model::newInstance()
      *
-     * @param  array  $options
-     * @return bool
+     * @param  array  $attributes
+     * @param  bool  $exists
+     * @return static
      */
-    public function save(array $options = [])
+    public function newInstance($attributes = [], $exists = false)
     {
-        static::$fillableDynamic = [];
+        $model = parent::newInstance([], $exists);
 
-        return parent::save($options);
+        $model->fillable = $this->fillable;
+        $model->appends = $this->appends;
+        $model->visible = $this->visible;
+
+        if ($attributes) {
+            $model->fill($attributes);
+        }
+
+        return $model;
     }
 
     /**
@@ -322,7 +340,7 @@ trait ModelTrait
     /**
      * Get calculated attributes
      *
-     * @return array|NULL
+     * @return array|null
      */
     public function getCalculated()
     {
@@ -332,7 +350,7 @@ trait ModelTrait
     /**
      * Get unchangeable attributes
      *
-     * @return array|NULL
+     * @return array|null
      */
     public function getUnchangeable()
     {
@@ -342,7 +360,7 @@ trait ModelTrait
     /**
      * Get unique attributes
      *
-     * @return array|NULL
+     * @return array|null
      */
     public function getUnique()
     {
@@ -435,7 +453,7 @@ trait ModelTrait
      * Json Cast with convertation: '' => null
      *
      * @param mixed $data
-     * @return string|NULL
+     * @return string|null
      */
     protected function jsonCastEmptyStringsToNull($data): ?string
     {

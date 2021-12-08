@@ -75,6 +75,8 @@ class ModelValidateCommand extends Command
         $bar->setMessage('');
         $bar->finish();
         $this->output->newLine();
+
+        return Command::SUCCESS;
     }
 
     /**

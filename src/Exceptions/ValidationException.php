@@ -76,7 +76,7 @@ class ValidationException extends \Illuminate\Validation\ValidationException
     /**
      * @param mixed $prefix
      * @param boolean $replaceKey
-     * @return string|NULL
+     * @return string|null
      */
     protected function canonizePrefix($prefix, bool $replaceKey)
     {
