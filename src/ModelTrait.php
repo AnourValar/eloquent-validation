@@ -283,6 +283,7 @@ trait ModelTrait
         $model->fillable = $this->fillable;
         $model->appends = $this->appends;
         $model->visible = $this->visible;
+        $model->hidden = $this->hidden;
 
         if ($attributes) {
             $model->fill($attributes);
