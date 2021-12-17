@@ -29,6 +29,7 @@ class EloquentValidationServiceProvider extends ServiceProvider
         $this->addArrayKeysRule();
         $this->addArrayKeysOnlyRule();
         $this->addNotEmpty();
+        $this->addIsListRule();
 
         // langs
         $this->loadTranslationsFrom(__DIR__.'/../resources/lang/', 'eloquent-validation');
@@ -167,6 +168,25 @@ class EloquentValidationServiceProvider extends ServiceProvider
         {
             return trans(
                 'eloquent-validation::validation.not_empty',
+                ['attribute' => $validator->getDisplayableAttribute($attribute)]
+            );
+        });
+    }
+
+    /**
+     * @return void
+     */
+    private function addIsListRule(): void
+    {
+        \Validator::extend('is_list', function ($attribute, $value, $parameters, $validator)
+        {
+            return is_array($value) && \Arr::isList($value);
+        });
+
+        \Validator::replacer('is_list', function ($message, $attribute, $rule, $parameters, $validator)
+        {
+            return trans(
+                'eloquent-validation::validation.is_list',
                 ['attribute' => $validator->getDisplayableAttribute($attribute)]
             );
         });

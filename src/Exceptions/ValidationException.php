@@ -9,7 +9,7 @@ class ValidationException extends \Illuminate\Validation\ValidationException
      * @param mixed $response
      * @param string $errorBag
      * @param mixed $prefix
-     * @param boolean $replaceKey
+     * @param bool $replaceKey
      */
     public function __construct($errors, $response = null, $errorBag = 'default', $prefix = null, bool $replaceKey = false)
     {
@@ -75,7 +75,7 @@ class ValidationException extends \Illuminate\Validation\ValidationException
 
     /**
      * @param mixed $prefix
-     * @param boolean $replaceKey
+     * @param bool $replaceKey
      * @return string|null
      */
     protected function canonizePrefix($prefix, bool $replaceKey)

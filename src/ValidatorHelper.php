@@ -45,7 +45,7 @@ class ValidatorHelper
      * Check if value should be null
      *
      * @param mixed $value
-     * @return boolean
+     * @return bool
      */
     public function isEmpty($value): bool
     {

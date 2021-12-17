@@ -82,7 +82,7 @@ class ModelValidateCommand extends Command
     /**
      * @param string $path
      * @param string $namespace
-     * @param boolean $recursive
+     * @param bool $recursive
      * @return array
      */
     protected function getModels(string $path, string $namespace, bool $recursive): array
