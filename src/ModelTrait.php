@@ -75,18 +75,13 @@ trait ModelTrait
     /**
      * Save validation
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
      * @param mixed $prefix
      * @param array $additionalRules
      * @param array $additionalAttributeNames
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function scopeValidate(
-        \Illuminate\Database\Eloquent\Builder $query,
-        $prefix = null,
-        array $additionalRules = null,
-        array $additionalAttributeNames = null
-    ) {
+    public function validate($prefix = null, array $additionalRules = null, array $additionalAttributeNames = null)
+    {
         if ($additionalAttributeNames) {
             $defaultAttributeNames = $this->getAttributeNames();
             $this->setAttributeNames(array_replace($defaultAttributeNames, $additionalAttributeNames));
@@ -169,18 +164,13 @@ trait ModelTrait
     /**
      * Delete validation
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
      * @param mixed $prefix
      * @param array $additionalRules
      * @param array $additionalAttributeNames
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function scopeValidateDelete(
-        \Illuminate\Database\Eloquent\Builder $query,
-        $prefix = null,
-        array $additionalRules = null,
-        array $additionalAttributeNames = null
-    ) {
+    public function validateDelete($prefix = null, array $additionalRules = null, array $additionalAttributeNames = null)
+    {
         if ($additionalAttributeNames) {
             $defaultAttributeNames = $this->getAttributeNames();
             $this->setAttributeNames(array_replace($defaultAttributeNames, $additionalAttributeNames));
