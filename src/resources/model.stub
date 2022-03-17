@@ -3,6 +3,7 @@
 namespace DummyNamespace;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class DummyClass extends Model
 {
@@ -73,7 +74,7 @@ class DummyClass extends Model
     ];
 
     /**
-     * The model's attributes. (default)
+     * The model's attributes.
      *
      * @var array
      */

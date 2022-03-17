@@ -33,7 +33,7 @@ class EloquentValidationServiceProvider extends ServiceProvider
 
         // langs
         $this->loadTranslationsFrom(__DIR__.'/../resources/lang/', 'eloquent-validation');
-        $this->publishes([__DIR__.'/../resources/lang/' => resource_path('lang/vendor/eloquent-validation')]);
+        $this->publishes([__DIR__.'/../resources/lang/' => lang_path('vendor/eloquent-validation')]);
 
         // commands
         if ($this->app->runningInConsole()) {
