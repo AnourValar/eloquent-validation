@@ -253,7 +253,7 @@ trait ModelTrait
 
         $this->appends = [];
         foreach ($args as $arg) {
-            if ($this->hasGetMutator($arg)) {
+            if (! $this->hasCast($arg)) {
                 $this->appends[] = $arg;
             }
         }
