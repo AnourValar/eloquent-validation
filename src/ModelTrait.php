@@ -69,6 +69,11 @@ trait ModelTrait
             $value = $this->setNull($value);
         }
 
+        if ($this->isDateAttribute($key) && !is_scalar($value) && !is_null($value) && !$value instanceof \DateTimeInterface) {
+            $this->attributes[$key] = $value;
+            return $this;
+        }
+
         return parent::setAttribute($key, $value);
     }
 
