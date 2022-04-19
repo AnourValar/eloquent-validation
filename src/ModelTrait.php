@@ -97,10 +97,21 @@ trait ModelTrait
         $validator->setAttributeNames($this->getAttributeNames());
         $passes = $validator->passes();
 
-        // Handles
+        // Rules
         if ($passes) {
             $attributes = $this->getAttributesForValidation();
 
+            $validator = \Validator::make($attributes, $this->canonizedRules());
+            if ($additionalRules) {
+                $validator->addRules($additionalRules);
+            }
+            $validator->setAttributeNames($this->getAttributeNames());
+
+            $passes = $validator->passes();
+        }
+
+        // Handles
+        if ($passes) {
             $validator = \Validator::make($attributes, []);
             $validator->setAttributeNames($this->getAttributeNames());
 
@@ -118,17 +129,6 @@ trait ModelTrait
                     $this->handleUnique($this->getUnique(), $validator);
                 }
             });
-
-            $passes = $validator->passes();
-        }
-
-        // Rules
-        if ($passes) {
-            $validator = \Validator::make($attributes, $this->canonizedRules());
-            if ($additionalRules) {
-                $validator->addRules($additionalRules);
-            }
-            $validator->setAttributeNames($this->getAttributeNames());
 
             $passes = $validator->passes();
         }
