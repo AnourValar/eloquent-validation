@@ -161,6 +161,10 @@ class EloquentValidationServiceProvider extends ServiceProvider
     {
         \Validator::extendImplicit('not_empty', function ($attribute, $value, $parameters, $validator)
         {
+            if (is_string($value)) {
+                $value = trim($value);
+            }
+
             return $value !== '';
         });
 
