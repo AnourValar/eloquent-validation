@@ -265,6 +265,19 @@ trait ModelTrait
     }
 
     /**
+     * Determine if the user has the given abilities related to the entity.
+     *
+     * @param  iterable|string  $abilities
+     * @return self
+     */
+    public function authorize($abilities)
+    {
+        app(\Illuminate\Contracts\Auth\Access\Gate::class)->authorize($abilities, $this);
+
+        return $this;
+    }
+
+    /**
      * @see \Illuminate\Database\Eloquent\Model::newInstance()
      *
      * @param  array  $attributes
@@ -580,7 +593,11 @@ trait ModelTrait
         foreach (array_keys($attributes) as $name) {
             $value = $this->getAttribute($name);
 
-            if (is_array($value)) {
+            if (
+                is_array($value)
+                || (is_string($attributes[$name]) && is_integer($value) && $attributes[$name] === (string) $value)
+                || (is_string($attributes[$name]) && is_float($value) && $attributes[$name] === (string) $value)
+            ) {
                 $attributes[$name] = $value;
             }
         }
