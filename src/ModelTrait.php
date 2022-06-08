@@ -268,13 +268,13 @@ trait ModelTrait
      * Determine if the user has the given abilities related to the entity.
      *
      * @param  iterable|string  $abilities
-     * @return self
+     * @return \Illuminate\Support\HigherOrderTapProxy
      */
     public function authorize($abilities)
     {
         app(\Illuminate\Contracts\Auth\Access\Gate::class)->authorize($abilities, $this);
 
-        return $this;
+        return tap($this);
     }
 
     /**
