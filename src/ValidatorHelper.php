@@ -79,8 +79,19 @@ class ValidatorHelper
                 if (is_array($item)) {
                     $value[$key] = $this->canonizeArray($value[$key], $schema, $currKey);
                 } elseif (isset($schema[$currKey])) {
-                    settype($item, $schema[$currKey]);
-                    $value[$key] = $item;
+                    $cast = $schema[$currKey];
+                    if (stripos($cast, '?') === 0) {
+                        if (is_null($item)) {
+                            $cast = null;
+                        } else {
+                            $cast = mb_substr($cast, 1);
+                        }
+                    }
+
+                    if ($cast) {
+                        settype($item, $cast);
+                        $value[$key] = $item;
+                    }
                 }
             }
         }
