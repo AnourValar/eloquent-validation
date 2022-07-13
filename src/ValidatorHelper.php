@@ -61,4 +61,34 @@ class ValidatorHelper
 
         return (is_null($value) || ((is_string($value) && trim($value) === '')));
     }
+
+    /**
+     * JSON nested mutator (helper)
+     *
+     * @param mixed $value
+     * @param array $schema
+     * @param string $parentKey
+     * @return mixed
+     */
+    public function canonizeArray(mixed $value, array $schema, string $parentKey = null): mixed
+    {
+        if (is_array($value)) {
+            foreach ($value as $key => $item) {
+                $currKey = (is_integer($key) && !is_null($parentKey)) ? $parentKey : $key;
+
+                if (is_array($item)) {
+                    $value[$key] = $this->canonizeArray($value[$key], $schema, $currKey);
+                } elseif (isset($schema[$currKey])) {
+                    settype($item, $schema[$currKey]);
+                    $value[$key] = $item;
+                }
+            }
+        }
+
+        if (is_null($parentKey) && !is_null($value)) {
+            $value = json_encode($value);
+        }
+
+        return $value;
+    }
 }
