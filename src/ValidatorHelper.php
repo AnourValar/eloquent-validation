@@ -66,20 +66,25 @@ class ValidatorHelper
      * JSON nested mutator (helper)
      *
      * @param mixed $value
-     * @param array $schema
+     * @param array $casts
+     * @param array $sorts
      * @param string $parentKey
      * @return mixed
      */
-    public function canonizeArray(mixed $value, array $schema, string $parentKey = null): mixed
+    public function canonizeArray(mixed $value, array $casts, array $sorts = null, string $parentKey = null): mixed
     {
         if (is_array($value)) {
             foreach ($value as $key => $item) {
                 $currKey = (is_integer($key) && !is_null($parentKey)) ? $parentKey : $key;
 
                 if (is_array($item)) {
-                    $value[$key] = $this->canonizeArray($value[$key], $schema, $currKey);
-                } elseif (isset($schema[$currKey])) {
-                    $cast = $schema[$currKey];
+                    $value[$key] = $this->canonizeArray($value[$key], $casts, $sorts, $currKey);
+
+                    if (in_array($key, (array) $sorts)) {
+                        sort($value[$key]);
+                    }
+                } elseif (isset($casts[$currKey])) {
+                    $cast = $casts[$currKey];
                     if (stripos($cast, '?') === 0) {
                         if (is_null($item)) {
                             $cast = null;
