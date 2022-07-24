@@ -77,7 +77,7 @@ class UserPhone extends Model
      *
      * @var array
      */
-    protected $calculated = [
+    protected $computed = [
         // columns which could be changed only in listeners (observers)
     ];
 
@@ -118,7 +118,7 @@ class UserPhone extends Model
      * @param \Illuminate\Validation\Validator $validator
      * @return void
      */
-    public function saveAfterValidation(\Illuminate\Validation\Validator $validator)
+    public function saveAfterValidation(\Illuminate\Validation\Validator $validator): void
     {
         if ($this->isDirty('user_id') && !\App\User::find($this->user_id)) {
             $validator->errors()->add('user_id', trans('models/user_phone.user_id_not_exists'));
@@ -131,7 +131,7 @@ class UserPhone extends Model
      * @param \Illuminate\Validation\Validator $validator
      * @return void
      */
-    public function deleteAfterValidation(\Illuminate\Validation\Validator $validator)
+    public function deleteAfterValidation(\Illuminate\Validation\Validator $validator): void
     {
         //
     }

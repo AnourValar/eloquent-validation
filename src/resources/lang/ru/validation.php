@@ -7,7 +7,7 @@ return [
     'not_empty' => 'Поле :attribute не может быть пустым.',
     'is_list' => 'Поле :attribute должно быть списком.',
 
-    'calculated' => 'Поле :attribute вычисляется автоматически.',
+    'computed' => 'Поле :attribute вычисляется автоматически.',
     'unchangeable' => 'Поле :attribute не может быть изменено.',
     'unique' => 'Сочетание полей :attributes должно быть уникальным.',
 ];

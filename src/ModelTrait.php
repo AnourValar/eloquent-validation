@@ -37,7 +37,7 @@ trait ModelTrait
      * @param \Illuminate\Validation\Validator $validator
      * @return void
      */
-    public function saveAfterValidation(\Illuminate\Validation\Validator $validator)
+    public function saveAfterValidation(\Illuminate\Validation\Validator $validator): void
     {
 
     }
@@ -48,7 +48,7 @@ trait ModelTrait
      * @param \Illuminate\Validation\Validator $validator
      * @return void
      */
-    public function deleteAfterValidation(\Illuminate\Validation\Validator $validator)
+    public function deleteAfterValidation(\Illuminate\Validation\Validator $validator): void
     {
 
     }
@@ -56,11 +56,16 @@ trait ModelTrait
     /**
      * @see \Illuminate\Database\Eloquent\Model
      *
-     * @param string $key
-     * @param string $value
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
      */
     public function setAttribute($key, $value)
     {
+        /*if (! $this->hasCast($key) && ! $this->hasSetMutator($key) && ! $this->hasAttributeSetMutator($key)) {
+            throw new \LogicException('Unexpected attribute "'.$key.'" was set.');
+        }*/
+
         if (isset($this->trim) && in_array($key, $this->trim)) {
             $value = $this->setTrim($value);
         }
@@ -76,6 +81,21 @@ trait ModelTrait
 
         return parent::setAttribute($key, $value);
     }
+
+    /**
+     * @see \Illuminate\Database\Eloquent\Model
+     *
+     * @param string $key
+     * @return mixed
+     */
+    /*public function getRelationValue($key)
+    {
+        if (! $this->isRelation($key) && ! $this->hasAttributeMutator($key)) {
+            throw new \LogicException('Unexpected attribute "'.$key.'" was get.');
+        }
+
+        return parent::getRelationValue($key);
+    }*/
 
     /**
      * Save validation
@@ -117,8 +137,8 @@ trait ModelTrait
 
             $validator->after(function ($validator)
             {
-                if ($this->getCalculated()) {
-                    $this->handleUnchangeable($this->getCalculated(), $validator, 'eloquent-validation::validation.calculated');
+                if ($this->getComputed()) {
+                    $this->handleUnchangeable($this->getComputed(), $validator, 'eloquent-validation::validation.computed');
                 }
 
                 if ($this->getUnchangeable() && $this->exists) {
@@ -211,6 +231,32 @@ trait ModelTrait
         }
 
         return $this;
+    }
+
+    /**
+     * Exclude few ids from "soft delete" constraintment
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $builder
+     * @param mixed $ids
+     * @return void
+     */
+    public function scopeTrashedOrNot(\Illuminate\Database\Eloquent\Builder $builder, mixed $ids)
+    {
+        if (! in_array(\Illuminate\Database\Eloquent\SoftDeletes::class, class_uses($builder->getModel()))) {
+            throw new \LogicException('Incorrect usage.');
+        }
+
+        if (! $ids) {
+            return;
+        }
+
+        $builder
+            ->withTrashed()
+            ->where(function ($query) use ($ids) {
+                $query
+                    ->whereNull($this->getDeletedAtColumn())
+                    ->orWhereIn($this->getKeyName(), (array) $ids);
+            });
     }
 
     /**
@@ -351,9 +397,9 @@ trait ModelTrait
      *
      * @return array|null
      */
-    public function getCalculated()
+    public function getComputed()
     {
-        return ( $this->calculated ?? null );
+        return ( $this->computed ?? null );
     }
 
     /**
@@ -615,7 +661,7 @@ trait ModelTrait
             'nullable' => (array) ($this->nullable ?? null),
             'hidden' => (array) ($this->hidden ?? null),
             'attributes' => array_keys($this->attributes),
-            'calculated' => (array) ($this->calculated ?? null),
+            'computed' => (array) ($this->computed ?? null),
             'unchangeable' => (array) ($this->unchangeable ?? null),
             'unique' => (array) ($this->unique ?? null),
         ];

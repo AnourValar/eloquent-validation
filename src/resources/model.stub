@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class DummyClass extends Model
 {
+    use \AnourValar\EloquentValidation\ModelTrait;
     //use \Illuminate\Database\Eloquent\Factories\HasFactory;
     //use \Illuminate\Database\Eloquent\SoftDeletes;
-    use \AnourValar\EloquentValidation\ModelTrait;
 
     /**
      * The connection name for the model.
@@ -99,7 +99,7 @@ class DummyClass extends Model
      *
      * @var array
      */
-    protected $calculated = [
+    protected $computed = [
 
     ];
 
@@ -139,7 +139,7 @@ class DummyClass extends Model
      * @param \Illuminate\Validation\Validator $validator
      * @return void
      */
-    public function saveAfterValidation(\Illuminate\Validation\Validator $validator)
+    public function saveAfterValidation(\Illuminate\Validation\Validator $validator): void
     {
         //$data = $validator->getData();
         //$validator->errors()->add('id', trans('models/DummyClass.id_not_exists'));
@@ -151,7 +151,7 @@ class DummyClass extends Model
      * @param \Illuminate\Validation\Validator $validator
      * @return void
      */
-    public function deleteAfterValidation(\Illuminate\Validation\Validator $validator)
+    public function deleteAfterValidation(\Illuminate\Validation\Validator $validator): void
     {
 
     }
