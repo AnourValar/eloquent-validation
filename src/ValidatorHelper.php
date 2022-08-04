@@ -63,7 +63,7 @@ class ValidatorHelper
     }
 
     /**
-     * JSON nested mutator (helper)
+     * JSON mutator: casts & sorts
      *
      * @param mixed $value
      * @param array $casts
@@ -71,14 +71,14 @@ class ValidatorHelper
      * @param string $parentKey
      * @return mixed
      */
-    public function canonizeArray(mixed $value, array $casts, array $sorts = null, string $parentKey = null): mixed
+    public function mutateArray(mixed $value, array $casts, array $sorts = null, string $parentKey = null): mixed
     {
         if (is_array($value)) {
             foreach ($value as $key => $item) {
                 $currKey = (is_integer($key) && !is_null($parentKey)) ? $parentKey : $key;
 
                 if (is_array($item)) {
-                    $value[$key] = $this->canonizeArray($value[$key], $casts, $sorts, $currKey);
+                    $value[$key] = $this->mutateArray($value[$key], $casts, $sorts, $currKey);
 
                     if (in_array($key, (array) $sorts)) {
                         sort($value[$key]);
@@ -102,7 +102,70 @@ class ValidatorHelper
         }
 
         if (is_null($parentKey) && !is_null($value)) {
-            $value = json_encode($value);
+            return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        }
+
+        return $value;
+    }
+
+    /**
+     * JSONB mutator
+     *
+     * @param mixed $value
+     * @param string tring $parentKey = null
+     * @return mixed
+     */
+    public function mutateJsonb(mixed $value, string $parentKey = null): mixed
+    {
+        if (is_array($value) && ! \Arr::isList($value)) {
+            uksort($value, function ($a, $b) {
+                $strlenA = mb_strlen($a);
+                $strlenB = mb_strlen($b);
+
+                if ($strlenA == $strlenB) {
+                    return $a <=> $b;
+                }
+
+                return $strlenA <=> $strlenB;
+            });
+        }
+
+        if (is_array($value)) {
+            foreach ($value as $key => &$item) {
+                $item = $this->mutateJsonb($item, $key);
+            }
+            unset($item);
+        }
+
+        if (is_null($parentKey) && !is_null($value)) {
+            return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        }
+
+        return $value;
+    }
+
+    /**
+     * JSON mutator: '' => null
+     *
+     * @param mixed $value
+     * @param string $parentKey = null
+     * @return mixed
+     */
+    public function mutateArrayNullable(mixed $value, string $parentKey = null): mixed
+    {
+        if (is_string($value) && trim($value) === '') {
+            $value = null;
+        }
+
+        if (is_array($value)) {
+            foreach ($value as $key => &$item) {
+                $item = $this->mutateArrayNullable($item, $key);
+            }
+            unset($item);
+        }
+
+        if (is_null($parentKey) && !is_null($value)) {
+            return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         }
 
         return $value;
