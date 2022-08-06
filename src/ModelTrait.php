@@ -2,7 +2,7 @@
 
 namespace AnourValar\EloquentValidation;
 
-use \AnourValar\EloquentValidation\Exceptions\ValidationException;
+use AnourValar\EloquentValidation\Exceptions\ValidationException;
 use Illuminate\Support\Str;
 
 trait ModelTrait
@@ -74,10 +74,12 @@ trait ModelTrait
             $value = $this->setNull($value);
         }
 
-        if ($this->isDateAttribute($key) && !is_scalar($value) && !is_null($value) && !$value instanceof \DateTimeInterface) {
+        if ($this->isDateAttribute($key) && ! is_scalar($value) && ! is_null($value) && ! $value instanceof \DateTimeInterface) {
             $this->attributes[$key] = $value;
             return $this;
         }
+
+        $value = $this->setJsonNested($value, ($this->getJsonNested()[$key] ?? null));
 
         return parent::setAttribute($key, $value);
     }
@@ -135,8 +137,7 @@ trait ModelTrait
             $validator = \Validator::make($attributes, []);
             $validator->setAttributeNames($this->getAttributeNames());
 
-            $validator->after(function ($validator)
-            {
+            $validator->after(function ($validator) {
                 if ($this->getComputed()) {
                     $this->handleUnchangeable($this->getComputed(), $validator, 'eloquent-validation::validation.computed');
                 }
@@ -158,8 +159,7 @@ trait ModelTrait
             $validator = \Validator::make($attributes, []);
             $validator->setAttributeNames($this->getAttributeNames());
 
-            $validator->after(function ()
-            {
+            $validator->after(function () {
                 static $triggered;
 
                 if (! $triggered) {
@@ -269,7 +269,7 @@ trait ModelTrait
         $args = func_get_args();
         array_shift($args);
 
-        if (!isset($args[0])) {
+        if (! isset($args[0])) {
             $args[0] = [];
         }
 
@@ -292,7 +292,7 @@ trait ModelTrait
         $args = func_get_args();
         array_shift($args);
 
-        if (!isset($args[0])) {
+        if (! isset($args[0])) {
             $args[0] = [];
         }
 
@@ -376,7 +376,7 @@ trait ModelTrait
                 $path = array_map([Str::class, 'snake'], $path);
                 $dir = implode('/', $path);
 
-                if (!$dir) {
+                if (! $dir) {
                     $dir = 'models';
                 }
 
@@ -423,6 +423,16 @@ trait ModelTrait
     }
 
     /**
+     * Get jsonNested attributes
+     *
+     * @return array|null
+     */
+    public function getJsonNested()
+    {
+        return ( $this->jsonNested ?? null );
+    }
+
+    /**
      * Handle "unchangeable"
      *
      * @param array $unchangeable
@@ -441,7 +451,7 @@ trait ModelTrait
         $newAttributes = $this->attributes;
 
         foreach ($unchangeable as $name) {
-            if (array_key_exists($name, $newAttributes) && !$this->originalIsEquivalent($name, $newAttributes[$name])) {
+            if (array_key_exists($name, $newAttributes) && ! $this->originalIsEquivalent($name, $newAttributes[$name])) {
                 $validator->errors()->add(
                     $name,
                     trans($translate, ['attribute' => $this->getAttributeDisplayName($name, $validator)])
@@ -467,7 +477,7 @@ trait ModelTrait
         foreach ($uniques as $unique) {
             $builder = new $this;
 
-            if (!$this->isDirty($unique) && $this->exists) {
+            if (! $this->isDirty($unique) && $this->exists) {
                 continue;
             }
 
@@ -618,6 +628,7 @@ trait ModelTrait
             'computed' => (array) ($this->computed ?? null),
             'unchangeable' => (array) ($this->unchangeable ?? null),
             'unique' => (array) ($this->unique ?? null),
+            'jsonNested' => array_keys($this->jsonNested ?? []),
         ];
 
         foreach (array_keys($this->saveRules()) as $attribute) {
@@ -655,8 +666,36 @@ trait ModelTrait
      */
     private function setNull($value)
     {
-        if ((is_string($value) && trim($value) === '') || (is_array($value) && !count($value))) {
+        if ((is_string($value) && trim($value) === '') || (is_array($value) && ! count($value))) {
             return null;
+        }
+
+        return $value;
+    }
+
+    /**
+     * Handle "jsonNested"
+     *
+     * @param mixed $value
+     * @param array $rules
+     * @return mixed
+     */
+    private function setJsonNested($value, array $rules = null)
+    {
+        if (! $rules) {
+            return $value;
+        }
+
+        if (! empty($rules['jsonb'])) {
+            $value = (new ValidatorHelper())->mutateJsonb($value);
+        }
+
+        if (! empty($rules['nullable'])) {
+            $value = (new ValidatorHelper())->mutateArrayNullable($value);
+        }
+
+        if (! empty($rules['types']) || ! empty($rules['sorts'])) {
+            $value = (new ValidatorHelper())->mutateArray($value, ($rules['types'] ?? null), ($rules['sorts'] ?? null));
         }
 
         return $value;

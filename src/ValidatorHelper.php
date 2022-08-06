@@ -20,8 +20,7 @@ class ValidatorHelper
             throw new \LogicException('Incorrect usage.');
         }
 
-        $validator->after(function (\Illuminate\Validation\Validator $validator) use ($closure)
-        {
+        $validator->after(function (\Illuminate\Validation\Validator $validator) use ($closure) {
             static $triggered;
 
             if (! $triggered) {
@@ -66,25 +65,25 @@ class ValidatorHelper
      * JSON mutator: casts & sorts
      *
      * @param mixed $value
-     * @param array $casts
+     * @param array $types
      * @param array $sorts
      * @param string $parentKey
      * @return mixed
      */
-    public function mutateArray(mixed $value, array $casts, array $sorts = null, string $parentKey = null): mixed
+    public function mutateArray(mixed $value, ?array $types, array $sorts = null, string $parentKey = null): mixed
     {
         if (is_array($value)) {
             foreach ($value as $key => $item) {
-                $currKey = (is_integer($key) && !is_null($parentKey)) ? $parentKey : $key;
+                $currKey = (is_integer($key) && ! is_null($parentKey)) ? $parentKey : $key;
 
                 if (is_array($item)) {
-                    $value[$key] = $this->mutateArray($value[$key], $casts, $sorts, $currKey);
+                    $value[$key] = $this->mutateArray($value[$key], $types, $sorts, $currKey);
 
                     if (in_array($key, (array) $sorts)) {
                         sort($value[$key]);
                     }
-                } elseif (isset($casts[$currKey])) {
-                    $cast = $casts[$currKey];
+                } elseif (isset($types[$currKey])) {
+                    $cast = $types[$currKey];
                     if (stripos($cast, '?') === 0) {
                         if (is_null($item)) {
                             $cast = null;
@@ -101,10 +100,6 @@ class ValidatorHelper
             }
         }
 
-        if (is_null($parentKey) && !is_null($value)) {
-            return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        }
-
         return $value;
     }
 
@@ -112,10 +107,9 @@ class ValidatorHelper
      * JSONB mutator
      *
      * @param mixed $value
-     * @param string tring $parentKey = null
      * @return mixed
      */
-    public function mutateJsonb(mixed $value, string $parentKey = null): mixed
+    public function mutateJsonb(mixed $value): mixed
     {
         if (is_array($value) && ! \Arr::isList($value)) {
             uksort($value, function ($a, $b) {
@@ -131,14 +125,10 @@ class ValidatorHelper
         }
 
         if (is_array($value)) {
-            foreach ($value as $key => &$item) {
-                $item = $this->mutateJsonb($item, $key);
+            foreach ($value as &$item) {
+                $item = $this->mutateJsonb($item);
             }
             unset($item);
-        }
-
-        if (is_null($parentKey) && !is_null($value)) {
-            return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         }
 
         return $value;
@@ -148,24 +138,19 @@ class ValidatorHelper
      * JSON mutator: '' => null
      *
      * @param mixed $value
-     * @param string $parentKey = null
      * @return mixed
      */
-    public function mutateArrayNullable(mixed $value, string $parentKey = null): mixed
+    public function mutateArrayNullable(mixed $value): mixed
     {
         if (is_string($value) && trim($value) === '') {
             $value = null;
         }
 
         if (is_array($value)) {
-            foreach ($value as $key => &$item) {
-                $item = $this->mutateArrayNullable($item, $key);
+            foreach ($value as &$item) {
+                $item = $this->mutateArrayNullable($item);
             }
             unset($item);
-        }
-
-        if (is_null($parentKey) && !is_null($value)) {
-            return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         }
 
         return $value;

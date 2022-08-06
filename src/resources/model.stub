@@ -2,7 +2,6 @@
 
 namespace DummyNamespace;
 
-use AnourValar\EloquentValidation\ValidatorHelper;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 
@@ -93,6 +92,24 @@ class DummyClass extends Model
 
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+    ];
+
+    /**
+     * Mutators for nested JSON.
+     * jsonb - sort an array by key 
+     * nullable - '' => null convertation
+     * types - set the type of a value (nested)
+     * sorts - sort an array (nested)
+     *
+     * @var array
+     */
+    protected $jsonNested = [
+        '' => [
+            'jsonb' => false,
+            'nullable' => false,
+            'types' => [],
+            'sorts' => [],
+        ],
     ];
 
     /**

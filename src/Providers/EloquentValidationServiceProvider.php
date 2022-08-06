@@ -49,8 +49,7 @@ class EloquentValidationServiceProvider extends ServiceProvider
      */
     private function addScalarRule(): void
     {
-        \Validator::extend('scalar', function ($attribute, $value, $parameters, $validator)
-        {
+        \Validator::extend('scalar', function ($attribute, $value, $parameters, $validator) {
             return ( is_scalar($value) || is_null($value) || (is_object($value) && method_exists($value, '__toString')) );
         });
 
@@ -67,8 +66,7 @@ class EloquentValidationServiceProvider extends ServiceProvider
      */
     private function addConfigRule(): void
     {
-        \Validator::extend('config', function ($attribute, $value, $parameters, $validator)
-        {
+        \Validator::extend('config', function ($attribute, $value, $parameters, $validator) {
             if (empty($parameters[0])) {
                 throw new \LogicException('Parameter required for "config" rule!');
             }
@@ -79,7 +77,7 @@ class EloquentValidationServiceProvider extends ServiceProvider
 
             if (is_array($value)) {
                 foreach ($value as $item) {
-                    if (!is_scalar($item) || !isset(config($parameters[0])[$item])) {
+                    if (! is_scalar($item) || ! isset(config($parameters[0])[$item])) {
                         return false;
                     }
                 }
@@ -94,8 +92,7 @@ class EloquentValidationServiceProvider extends ServiceProvider
             return false;
         });
 
-        \Validator::replacer('config', function ($message, $attribute, $rule, $parameters, $validator)
-        {
+        \Validator::replacer('config', function ($message, $attribute, $rule, $parameters, $validator) {
             return trans(
                 'eloquent-validation::validation.config',
                 ['attribute' => $validator->getDisplayableAttribute($attribute)]
@@ -108,8 +105,7 @@ class EloquentValidationServiceProvider extends ServiceProvider
      */
     private function addArrayKeysRule(): void
     {
-        \Validator::extend('array_keys', function ($attribute, $value, $parameters, $validator)
-        {
+        \Validator::extend('array_keys', function ($attribute, $value, $parameters, $validator) {
             $attribute .= '.';
             foreach (array_keys($validator->getRules()) as $item) {
                 if (strpos($item, $attribute) !== 0) {
@@ -123,11 +119,10 @@ class EloquentValidationServiceProvider extends ServiceProvider
             }
             $parameters = array_unique($parameters);
 
-            return ( is_array($value) && !array_diff_key($value, array_combine($parameters, $parameters)) );
+            return ( is_array($value) && ! array_diff_key($value, array_combine($parameters, $parameters)) );
         });
 
-        \Validator::replacer('array_keys', function ($message, $attribute, $rule, $parameters, $validator)
-        {
+        \Validator::replacer('array_keys', function ($message, $attribute, $rule, $parameters, $validator) {
             return trans(
                 'eloquent-validation::validation.array_keys',
                 ['attribute' => $validator->getDisplayableAttribute($attribute)]
@@ -140,13 +135,11 @@ class EloquentValidationServiceProvider extends ServiceProvider
      */
     private function addArrayKeysOnlyRule(): void
     {
-        \Validator::extend('array_keys_only', function ($attribute, $value, $parameters, $validator)
-        {
-            return ( is_array($value) && !array_diff_key($value, array_combine($parameters, $parameters)) );
+        \Validator::extend('array_keys_only', function ($attribute, $value, $parameters, $validator) {
+            return ( is_array($value) && ! array_diff_key($value, array_combine($parameters, $parameters)) );
         });
 
-        \Validator::replacer('array_keys_only', function ($message, $attribute, $rule, $parameters, $validator)
-        {
+        \Validator::replacer('array_keys_only', function ($message, $attribute, $rule, $parameters, $validator) {
             return trans(
                 'eloquent-validation::validation.array_keys',
                 ['attribute' => $validator->getDisplayableAttribute($attribute)]
@@ -159,8 +152,7 @@ class EloquentValidationServiceProvider extends ServiceProvider
      */
     private function addNotEmpty(): void
     {
-        \Validator::extendImplicit('not_empty', function ($attribute, $value, $parameters, $validator)
-        {
+        \Validator::extendImplicit('not_empty', function ($attribute, $value, $parameters, $validator) {
             if (is_string($value)) {
                 $value = trim($value);
             }
@@ -168,8 +160,7 @@ class EloquentValidationServiceProvider extends ServiceProvider
             return $value !== '';
         });
 
-        \Validator::replacer('not_empty', function ($message, $attribute, $rule, $parameters, $validator)
-        {
+        \Validator::replacer('not_empty', function ($message, $attribute, $rule, $parameters, $validator) {
             return trans(
                 'eloquent-validation::validation.not_empty',
                 ['attribute' => $validator->getDisplayableAttribute($attribute)]
@@ -182,13 +173,11 @@ class EloquentValidationServiceProvider extends ServiceProvider
      */
     private function addIsListRule(): void
     {
-        \Validator::extend('is_list', function ($attribute, $value, $parameters, $validator)
-        {
+        \Validator::extend('is_list', function ($attribute, $value, $parameters, $validator) {
             return is_array($value) && \Arr::isList($value);
         });
 
-        \Validator::replacer('is_list', function ($message, $attribute, $rule, $parameters, $validator)
-        {
+        \Validator::replacer('is_list', function ($message, $attribute, $rule, $parameters, $validator) {
             return trans(
                 'eloquent-validation::validation.is_list',
                 ['attribute' => $validator->getDisplayableAttribute($attribute)]

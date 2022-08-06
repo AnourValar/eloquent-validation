@@ -21,7 +21,7 @@ class ValidationException extends \Illuminate\Validation\ValidationException
             } else {
                 $validator = \Validator::make([], []);
                 foreach ($errors->errors()->messages() as $key => $items) {
-                    if ($replaceKey && !is_null($prefix)) {
+                    if ($replaceKey) {
                         $key = '';
                     }
 
@@ -37,7 +37,7 @@ class ValidationException extends \Illuminate\Validation\ValidationException
 
             $validator = \Validator::make([], []);
             foreach ($errors as $key => $items) {
-                if ($replaceKey && !is_null($prefix)) {
+                if ($replaceKey && ! is_null($prefix)) {
                     $key = '';
                 }
 
@@ -85,7 +85,7 @@ class ValidationException extends \Illuminate\Validation\ValidationException
         }
 
         foreach ($prefix as $key => $item) {
-            if (!is_scalar($item) || !mb_strlen($item)) {
+            if (! is_scalar($item) || ! mb_strlen($item)) {
                 unset($prefix[$key]);
             }
         }

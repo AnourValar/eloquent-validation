@@ -184,7 +184,7 @@ class ModelValidateCommand extends Command
 
         $diff = array_diff($collection, array_keys($model->getCasts()));
         if ($diff) {
-            throw new \LogicException('Unpresent attributes in casts: ' . implode(', ', $diff));
+            throw new \LogicException('Unrepresented attribute in the casts: ' . implode(', ', $diff));
         }
     }
 }
