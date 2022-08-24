@@ -41,60 +41,54 @@ class ValidatorHelper
     }
 
     /**
-     * Check if value should be null
-     *
-     * @param mixed $value
-     * @return bool
-     */
-    public function isEmpty($value): bool
-    {
-        if (is_array($value)) {
-            foreach ($value as $item) {
-                if (! $this->isEmpty($item)) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        return (is_null($value) || ((is_string($value) && trim($value) === '')));
-    }
-
-    /**
      * JSON mutator: casts & sorts
      *
      * @param mixed $value
      * @param array $types
      * @param array $sorts
-     * @param string $parentKey
+     * @param array $parentKeys
      * @return mixed
      */
-    public function mutateArray(mixed $value, ?array $types, array $sorts = null, string $parentKey = null): mixed
+    public function mutateArray(mixed $value, ?array $types, array $sorts = null, array $parentKeys = []): mixed
     {
         if (is_array($value)) {
+            $parentKey = null;
+            if ($parentKeys) {
+                $parentKey = $parentKeys[array_key_last($parentKeys)];
+            }
+
             foreach ($value as $key => $item) {
                 $currKey = (is_integer($key) && ! is_null($parentKey)) ? $parentKey : $key;
+                $path = array_merge($parentKeys, [$currKey]);
 
                 if (is_array($item)) {
-                    $value[$key] = $this->mutateArray($value[$key], $types, $sorts, $currKey);
+                    $value[$key] = $this->mutateArray($value[$key], $types, $sorts, $path);
 
-                    if (in_array($key, (array) $sorts)) {
+                    foreach ((array) $sorts as $sortKey) {
+                        if (! $this->isMatching($sortKey, $path)) {
+                            continue;
+                        }
+
                         sort($value[$key]);
                     }
-                } elseif (isset($types[$currKey])) {
-                    $cast = $types[$currKey];
-                    if (stripos($cast, '?') === 0) {
-                        if (is_null($item)) {
-                            $cast = null;
-                        } else {
-                            $cast = mb_substr($cast, 1);
+                } else {
+                    foreach ((array) $types as $typeKey => $cast) {
+                        if (! $this->isMatching($typeKey, $path)) {
+                            continue;
                         }
-                    }
 
-                    if ($cast) {
-                        settype($item, $cast);
-                        $value[$key] = $item;
+                        if (stripos($cast, '?') === 0) {
+                            if (is_null($item)) {
+                                $cast = null;
+                            } else {
+                                $cast = mb_substr($cast, 1);
+                            }
+                        }
+
+                        if ($cast) {
+                            settype($item, $cast);
+                            $value[$key] = $item;
+                        }
                     }
                 }
             }
@@ -154,5 +148,29 @@ class ValidatorHelper
         }
 
         return $value;
+    }
+
+    /**
+     * @param string $key
+     * @param array $path
+     * @return bool
+     */
+    private function isMatching(string $key, array $path): bool
+    {
+        $key = explode('.', $key);
+
+        while ($partKey = array_pop($key)) {
+            $partPath = array_pop($path);
+
+            if (is_null($partPath)) {
+                return false;
+            }
+
+            if ($partPath !== $partKey && $partKey !== '*') {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

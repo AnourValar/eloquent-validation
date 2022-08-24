@@ -22,6 +22,13 @@ trait ModelTrait
     protected static $attributeNames;
 
     /**
+     * Available attributes without explicit presence
+     *
+     * @var array
+     */
+    protected $nonStrictAttributes = ['is_actual', 'attributes', 'optgroup'];
+
+    /**
      * Get the validation rules
      *
      * @return array
@@ -62,9 +69,16 @@ trait ModelTrait
      */
     public function setAttribute($key, $value)
     {
-        /*if (! $this->hasCast($key) && ! $this->hasSetMutator($key) && ! $this->hasAttributeSetMutator($key)) {
-            throw new \LogicException('Unexpected attribute "'.$key.'" was set.');
-        }*/
+        if (
+            \App::hasDebugModeEnabled()
+            && ! in_array($key, $this->nonStrictAttributes)
+            && ! $this->hasCast($key)
+            && ! $this->hasSetMutator($key)
+            && ! $this->hasAttributeSetMutator($key)
+            && ! $this->isRelation($key)
+        ) {
+            throw new \LogicException('Unexpected attribute "'.$key.'" was "set".');
+        }
 
         if (isset($this->trim) && in_array($key, $this->trim)) {
             $value = $this->setTrim($value);
@@ -90,14 +104,18 @@ trait ModelTrait
      * @param string $key
      * @return mixed
      */
-    /*public function getRelationValue($key)
+    public function getRelationValue($key)
     {
-        if (! $this->isRelation($key) && ! $this->hasAttributeMutator($key)) {
-            throw new \LogicException('Unexpected attribute "'.$key.'" was get.');
+        if (
+            \App::hasDebugModeEnabled()
+            && ! in_array($key, $this->nonStrictAttributes)
+            && ! $this->isRelation($key)
+        ) {
+            throw new \LogicException('Unexpected attribute "'.$key.'" was "get".');
         }
 
         return parent::getRelationValue($key);
-    }*/
+    }
 
     /**
      * Save validation
@@ -638,6 +656,19 @@ trait ModelTrait
         }
 
         return $attributes;
+    }
+
+    /**
+     * Merge new jsonNested with existing jsonNested on the model.
+     *
+     * @param array $jsonNested
+     * @return self
+     */
+    public function mergeJsonNested(array $jsonNested): self
+    {
+        $this->jsonNested = array_merge($this->jsonNested, $jsonNested);
+
+        return $this;
     }
 
     /**

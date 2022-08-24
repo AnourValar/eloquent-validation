@@ -5,82 +5,117 @@ namespace AnourValar\EloquentValidation\Exceptions;
 class ValidationException extends \Illuminate\Validation\ValidationException
 {
     /**
-     * @param mixed $errors
+     * @param mixed $validator
      * @param mixed $response
      * @param string $errorBag
      * @param mixed $prefix
-     * @param bool $replaceKey
+     * @return void
      */
-    public function __construct($errors, $response = null, $errorBag = 'default', $prefix = null, bool $replaceKey = false)
+    public function __construct($validator, $response = null, $errorBag = 'default', $prefix = null)
     {
-        $prefix = $this->canonizePrefix($prefix, $replaceKey);
+        $prefix = $this->canonizePrefix($prefix);
 
-        if ($errors instanceof \Illuminate\Validation\Validator) {
+        if ($validator instanceof \Illuminate\Validation\Validator) {
             if (is_null($prefix)) {
-                $validator = $errors;
+                $canonizedValidator = $validator;
             } else {
-                $validator = \Validator::make([], []);
-                foreach ($errors->errors()->messages() as $key => $items) {
-                    if ($replaceKey) {
-                        $key = '';
-                    }
-
+                $canonizedValidator = \Validator::make([], []);
+                foreach ($validator->errors()->messages() as $key => $items) {
                     foreach ((array) $items as $item) {
-                        $validator->errors()->add($prefix.$key, $item);
+                        $canonizedValidator->errors()->add($prefix.$key, $item);
                     }
                 }
             }
         } else {
-            if (is_scalar($errors)) {
-                $errors = ['error' => $errors];
+            if (is_scalar($validator)) {
+                $validator = ['error' => $validator];
             }
 
-            $validator = \Validator::make([], []);
-            foreach ($errors as $key => $items) {
-                if ($replaceKey && ! is_null($prefix)) {
-                    $key = '';
-                }
-
+            $canonizedValidator = \Validator::make([], []);
+            foreach ($validator as $key => $items) {
                 foreach ((array) $items as $item) {
-                    $validator->errors()->add($prefix.$key, $item);
+                    $canonizedValidator->errors()->add($prefix.$key, $item);
                 }
             }
         }
 
-        parent::__construct($validator, $response, $errorBag);
+        parent::__construct($canonizedValidator, $response, $errorBag);
     }
 
     /**
-     * Add prefix to keys
+     * Add prefix to the keys
      *
-     * @param mixed $prefix
-     * @return \AnourValar\EloquentValidation\Exceptions\ValidationException
+     * @param array|string $prefix
+     * @return static
      */
-    public function addPrefix($prefix): ValidationException
+    public function addPrefix(array|string|null $prefix): ValidationException
     {
-        $prefix = $this->canonizePrefix($prefix, false);
+        return new static($this->validator, $this->response, $this->errorBag, $prefix);
+    }
+
+    /**
+     * Replace the keys
+     *
+     * @param string $from
+     * @param string|null $to
+     * @return static
+     */
+    public function replaceKey(string $from, ?string $to): ValidationException
+    {
+        if (is_null($to) || $from === $to) {
+            return new static($this->validator, $this->response, $this->errorBag);
+        }
 
         $validator = \Validator::make([], []);
 
         foreach ($this->validator->errors()->messages() as $key => $items) {
+            if ($key == $from) {
+                $key = $to;
+            }
+
+            if (strpos($key, "$from.") === 0) {
+                $key = mb_substr($key, mb_strlen($from));
+                $key = $to . $key;
+
+                if (! mb_strlen($to)) {
+                    $key = mb_substr($key, 1);
+                }
+            }
+
+            if (strpos($key, ".$from") === (mb_strlen($key) - mb_strlen($from) - 1)) {
+                $key = mb_substr($key, 0, -mb_strlen($from));
+                $key = $key . $to;
+
+                if (! mb_strlen($to)) {
+                    $key = mb_substr($key, 0, -1);
+                }
+            }
+
+            if (! mb_strlen($to)) {
+                $key = str_replace(".$from.", '.', $key);
+            } else {
+                $key = str_replace(".$from.", ".$to.", $key);
+            }
+
             foreach ((array) $items as $item) {
-                $validator->errors()->add($prefix.$key, $item);
+                $validator->errors()->add($key, $item);
             }
         }
 
-        $this->validator = $validator;
-
-        return $this;
+        return new static($validator, $this->response, $this->errorBag);
     }
 
     /**
      * @param mixed $prefix
-     * @param bool $replaceKey
      * @return string|null
      */
-    protected function canonizePrefix($prefix, bool $replaceKey)
+    protected function canonizePrefix(mixed $prefix): ?string
     {
         if (! is_iterable($prefix)) {
+            if (is_string($prefix) && mb_strlen($prefix)) {
+                $prefix .= '.';
+            }
+
             return $prefix;
         }
 
@@ -91,11 +126,7 @@ class ValidationException extends \Illuminate\Validation\ValidationException
         }
 
         if ($prefix) {
-            $prefix = implode('.', $prefix);
-
-            if (! $replaceKey) {
-                $prefix .= '.';
-            }
+            $prefix = implode('.', $prefix) . '.';
         } else {
             $prefix = null;
         }
