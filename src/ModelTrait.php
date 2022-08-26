@@ -75,6 +75,7 @@ trait ModelTrait
             && ! $this->hasCast($key)
             && ! $this->hasSetMutator($key)
             && ! $this->hasAttributeSetMutator($key)
+            && ! $this->relationLoaded($key)
             && ! $this->isRelation($key)
         ) {
             throw new \LogicException('Unexpected attribute "'.$key.'" was "set".');
@@ -109,6 +110,7 @@ trait ModelTrait
         if (
             \App::hasDebugModeEnabled()
             && ! in_array($key, $this->nonStrictAttributes)
+            && ! $this->relationLoaded($key)
             && ! $this->isRelation($key)
         ) {
             throw new \LogicException('Unexpected attribute "'.$key.'" was "get".');
