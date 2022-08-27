@@ -89,9 +89,18 @@ trait ModelTrait
             $value = $this->setNull($value);
         }
 
-        if ($this->isDateAttribute($key) && ! is_scalar($value) && ! is_null($value) && ! $value instanceof \DateTimeInterface) {
-            $this->attributes[$key] = $value;
-            return $this;
+        if ($this->isDateAttribute($key)) {
+            if (! is_scalar($value) && ! is_null($value) && ! $value instanceof \DateTimeInterface) {
+                $this->attributes[$key] = $value;
+                return $this;
+            }
+
+            try {
+                \Date::parse($value);
+            } catch (\Carbon\Exceptions\InvalidFormatException $e) {
+                $this->attributes[$key] = $value;
+                return $this;
+            }
         }
 
         $value = $this->setJsonNested($value, ($this->getJsonNested()[$key] ?? null));
@@ -621,7 +630,11 @@ trait ModelTrait
         $attributes = $this->attributes;
 
         foreach (array_keys($attributes) as $name) {
-            $value = $this->getAttribute($name);
+            try {
+                $value = $this->getAttribute($name);
+            } catch (\Carbon\Exceptions\InvalidFormatException $e) {
+                $value = $attributes[$name];
+            }
 
             if (
                 is_array($value)
