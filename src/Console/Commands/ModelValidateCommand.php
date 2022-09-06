@@ -153,6 +153,7 @@ class ModelValidateCommand extends Command
      */
     protected function checkConfiguration(\Illuminate\Database\Eloquent\Model $model): void
     {
+        $modelName = get_class($model);
         $collection = [];
 
         foreach ($model->extractAttributesListFromConfiguration() as $name => $value) {
@@ -166,15 +167,29 @@ class ModelValidateCommand extends Command
                     unset($batch);
 
                     if (count($value) != count(array_unique($value, SORT_REGULAR))) {
-                        throw new \LogicException("Duplicates for \"$name\"");
+                        throw new \LogicException("[$modelName] Duplicates for \"$name\"");
                     }
 
                     $collection = array_merge($collection, $flat);
 
+            } elseif ($name == 'attribute_names') {
+
+                foreach ($value as &$item) {
+                    $item = explode('.', $item)[0];
+                }
+                unset($item);
+
+                $collection = array_merge($collection, $value);
+
+                $diff = array_diff(array_keys($model->getCasts()), $value);
+                if ($diff) {
+                    throw new \LogicException('['.$modelName.'] Missed attribute in the attribute names: ' . implode(', ', $diff));
+                }
+
             } else {
 
                 if (count($value) != count(array_unique($value, SORT_REGULAR))) {
-                    throw new \LogicException("Duplicates for \"$name\": " . implode(', ', $value));
+                    throw new \LogicException("[$modelName] Duplicates for \"$name\": " . implode(', ', $value));
                 }
 
                 $collection = array_merge($collection, $value);
@@ -184,7 +199,7 @@ class ModelValidateCommand extends Command
 
         $diff = array_diff($collection, array_keys($model->getCasts()));
         if ($diff) {
-            throw new \LogicException('Unrepresented attribute in the casts: ' . implode(', ', $diff));
+            throw new \LogicException('['.$modelName.'] Unrepresented attribute in the casts: ' . implode(', ', $diff));
         }
     }
 }

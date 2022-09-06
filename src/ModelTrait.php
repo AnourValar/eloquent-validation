@@ -19,7 +19,7 @@ trait ModelTrait
      *
      * @var array|null
      */
-    protected static $attributeNames;
+    private static $attributeNames;
 
     /**
      * Available attributes without explicit presence
@@ -72,6 +72,11 @@ trait ModelTrait
         if (
             \App::hasDebugModeEnabled()
             && ! in_array($key, $this->nonStrictAttributes)
+            && ! strpos($key, '_count')
+            && ! strpos($key, '_max')
+            && ! strpos($key, '_min')
+            && ! strpos($key, '_sum')
+            && ! strpos($key, '_avg')
             && ! $this->hasCast($key)
             && ! $this->hasSetMutator($key)
             && ! $this->hasAttributeSetMutator($key)
@@ -376,14 +381,17 @@ trait ModelTrait
     }
 
     /**
-     * Set the attributes names
+     * Set the attributes names. Careful with Octane.
      *
-     * @param array $attributeNames
+     * @param array|null $attributeNames
      * @return void
      */
-    public static function setAttributeNames(?array $attributeNames)
+    public static function setAttributeNames(?array $attributeNames): void
     {
-        static::$attributeNames = &$attributeNames;
+        $value = static::$attributeNames;
+        $value[\App::getLocale()] = $attributeNames;
+
+        static::$attributeNames = &$value;
     }
 
     /**
@@ -391,34 +399,30 @@ trait ModelTrait
      *
      * @return array
      */
-    public function getAttributeNames()
+    public function getAttributeNames(): array
     {
-        if (is_null(static::$attributeNames)) {
-            $attributeNames = [];
+        $locale = \App::getLocale();
 
-            if (\App::getLocale()) {
-                $path = explode('\\', get_class($this));
+        if (! isset(static::$attributeNames[$locale])) {
+            $value = static::$attributeNames;
 
-                $file = Str::snake(array_pop($path));
+            // model lang
+            $value[$locale] = $this->getAttributeNamesFromModelLang();
 
-                array_shift($path);
-                $path = array_map([Str::class, 'snake'], $path);
-                $dir = implode('/', $path);
-
-                if (! $dir) {
-                    $dir = 'models';
-                }
-
-                $attributeNames = trans($dir.'/'.$file.'.attributes');
-                if (! is_array($attributeNames)) {
-                    $attributeNames = [];
+            // validation.attributes
+            if (! $value[$locale]) {
+                $casts = array_keys($this->getCasts());
+                foreach ((array) trans('validation.attributes') as $attrName => $attrValue) {
+                    if (in_array($attrName, $casts)) {
+                        $value[$locale][$attrName] = $attrValue;
+                    }
                 }
             }
 
-            static::$attributeNames = &$attributeNames;
+            static::$attributeNames = &$value;
         }
 
-        return static::$attributeNames;
+        return static::$attributeNames[$locale];
     }
 
     /**
@@ -483,7 +487,7 @@ trait ModelTrait
             if (array_key_exists($name, $newAttributes) && ! $this->originalIsEquivalent($name, $newAttributes[$name])) {
                 $validator->errors()->add(
                     $name,
-                    trans($translate, ['attribute' => $this->getAttributeDisplayName($name, $validator)])
+                    trans($translate, ['attribute' => $validator->customAttributes[$name] ?? $name])
                 );
             }
         }
@@ -530,7 +534,7 @@ trait ModelTrait
                 $params = ['attributes' => []];
                 $key = null;
                 foreach ($unique as $field) {
-                    $params['attributes'][] = $this->getAttributeDisplayName($field, $validator);
+                    $params['attributes'][] = $validator->customAttributes[$field] ?? $field;
 
                     if (! isset($key)) {
                         $key = $field;
@@ -541,20 +545,6 @@ trait ModelTrait
                 $validator->errors()->add($key, trans($translate, $params));
             }
         }
-    }
-
-    /**
-     * @param string $attribute
-     * @param \Illuminate\Validation\Validator $validator
-     * @return string
-     */
-    private function getAttributeDisplayName(string $attribute, \Illuminate\Validation\Validator $validator): string
-    {
-        if (isset($validator->customAttributes[$attribute])) {
-            return $validator->customAttributes[$attribute];
-        }
-
-        return (trans('validation.attributes')[$attribute] ?? $attribute);
     }
 
     /**
@@ -662,6 +652,7 @@ trait ModelTrait
             'unchangeable' => (array) ($this->unchangeable ?? null),
             'unique' => (array) ($this->unique ?? null),
             'jsonNested' => array_keys($this->jsonNested ?? []),
+            'attribute_names' => array_keys($this->getAttributeNames()),
         ];
 
         foreach (array_keys($this->saveRules()) as $attribute) {
@@ -684,6 +675,33 @@ trait ModelTrait
         $this->jsonNested = array_merge($this->jsonNested, $jsonNested);
 
         return $this;
+    }
+
+    /**
+     * Get attribute names from model's lang
+     *
+     * @return array
+     */
+    protected function getAttributeNamesFromModelLang(): array
+    {
+        $path = explode('\\', get_class($this));
+
+        $file = Str::snake(array_pop($path));
+
+        array_shift($path);
+        $path = array_map([Str::class, 'snake'], $path);
+        $dir = implode('/', $path);
+
+        if (! $dir) {
+            $dir = 'models';
+        }
+
+        $result = trans($dir.'/'.$file.'.attributes');
+        if (! is_array($result)) {
+            $result = [];
+        }
+
+        return $result;
     }
 
     /**
