@@ -46,23 +46,25 @@ class ValidatorHelper
      * @param mixed $value
      * @param array $types
      * @param array $sorts
+     * @param array $lists
+     * @param array $purges
      * @param array $parentKeys
      * @return mixed
      */
-    public function mutateArray(mixed $value, ?array $types, array $sorts = null, array $parentKeys = []): mixed
-    {
+    public function mutateArray(
+        mixed $value,
+        ?array $types,
+        array $sorts = null,
+        array $lists = null,
+        array $purges = null,
+        array $parentKeys = []
+    ): mixed {
         if (is_array($value)) {
-            $parentKey = null;
-            if ($parentKeys) {
-                $parentKey = $parentKeys[array_key_last($parentKeys)];
-            }
-
             foreach ($value as $key => $item) {
-                $currKey = (is_integer($key) && ! is_null($parentKey)) ? $parentKey : $key;
-                $path = array_merge($parentKeys, [$currKey]);
+                $path = array_merge($parentKeys, [$key]);
 
                 if (is_array($item)) {
-                    $value[$key] = $this->mutateArray($value[$key], $types, $sorts, $path);
+                    $value[$key] = $this->mutateArray($value[$key], $types, $sorts, $lists, $purges, $path);
 
                     foreach ((array) $sorts as $sortKey) {
                         if (! $this->isMatching($sortKey, $path)) {
@@ -70,6 +72,16 @@ class ValidatorHelper
                         }
 
                         sort($value[$key]);
+                        break;
+                    }
+
+                    foreach ((array) $lists as $listKey) {
+                        if (! $this->isMatching($listKey, $path)) {
+                            continue;
+                        }
+
+                        $value[$key] = array_values($value[$key]);
+                        break;
                     }
                 } else {
                     foreach ((array) $types as $typeKey => $cast) {
@@ -88,6 +100,17 @@ class ValidatorHelper
                         if ($cast) {
                             settype($item, $cast);
                             $value[$key] = $item;
+                        }
+                    }
+
+                    if (is_null($item)) {
+                        foreach ((array) $purges as $purgeKey) {
+                            if (! $this->isMatching($purgeKey, $path)) {
+                                continue;
+                            }
+
+                            unset($value[$key]);
+                            break;
                         }
                     }
                 }
@@ -153,11 +176,20 @@ class ValidatorHelper
     /**
      * @param string $key
      * @param array $path
+     * @throws \LogicException
      * @return bool
      */
     private function isMatching(string $key, array $path): bool
     {
         $key = explode('.', $key);
+
+        if ($key[0] != '$') {
+            throw new \LogicException('JsonPath must starts with "$.<path>". Given: '.implode('.', $key));
+        }
+
+        if (count($key) != count($path)) {
+            return false;
+        }
 
         while ($partKey = array_pop($key)) {
             $partPath = array_pop($path);

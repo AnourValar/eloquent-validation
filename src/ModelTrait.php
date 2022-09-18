@@ -759,8 +759,16 @@ trait ModelTrait
             $value = (new ValidatorHelper())->mutateArrayNullable($value);
         }
 
-        if (! empty($rules['types']) || ! empty($rules['sorts'])) {
-            $value = (new ValidatorHelper())->mutateArray($value, ($rules['types'] ?? null), ($rules['sorts'] ?? null));
+        if (! empty($rules['types']) || ! empty($rules['sorts']) || ! empty($rules['lists']) || ! empty($rules['purges'])) {
+            $value = ['$' => $value];
+            $value = (new ValidatorHelper())->mutateArray(
+                $value,
+                ($rules['types'] ?? null),
+                ($rules['sorts'] ?? null),
+                ($rules['lists'] ?? null),
+                ($rules['purges'] ?? null)
+            );
+            $value = $value['$'];
         }
 
         return $value;
