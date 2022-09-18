@@ -751,10 +751,6 @@ trait ModelTrait
             return $value;
         }
 
-        if (! empty($rules['jsonb'])) {
-            $value = (new ValidatorHelper())->mutateJsonb($value);
-        }
-
         if (! empty($rules['nullable'])) {
             $value = (new ValidatorHelper())->mutateArrayNullable($value);
         }
@@ -769,6 +765,10 @@ trait ModelTrait
                 ($rules['purges'] ?? null)
             );
             $value = $value['$'];
+        }
+
+        if (! empty($rules['jsonb'])) {
+            $value = (new ValidatorHelper())->mutateJsonb($value);
         }
 
         return $value;
