@@ -122,6 +122,7 @@ trait ModelTrait
      */
     public function getRelationValue($key)
     {
+        // @TODO: Model::preventAccessingMissingAttributes() ?
         if (
             \App::hasDebugModeEnabled()
             && ! in_array($key, $this->nonStrictAttributes)
@@ -652,7 +653,7 @@ trait ModelTrait
             'computed' => (array) ($this->computed ?? null),
             'unchangeable' => (array) ($this->unchangeable ?? null),
             'unique' => (array) ($this->unique ?? null),
-            'jsonNested' => array_keys($this->jsonNested ?? []),
+            'jsonNested' => ($this->jsonNested ?? null),
             'attribute_names' => array_keys($this->getAttributeNames()),
         ];
 

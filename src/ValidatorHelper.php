@@ -174,18 +174,15 @@ class ValidatorHelper
     }
 
     /**
+     * Check if the key matches to the path
+     *
      * @param string $key
      * @param array $path
-     * @throws \LogicException
      * @return bool
      */
-    private function isMatching(string $key, array $path): bool
+    public function isMatching(string $key, array $path): bool
     {
         $key = explode('.', $key);
-
-        if ($key[0] != '$') {
-            throw new \LogicException('JsonPath must starts with "$.<path>". Given: '.implode('.', $key));
-        }
 
         if (count($key) != count($path)) {
             return false;

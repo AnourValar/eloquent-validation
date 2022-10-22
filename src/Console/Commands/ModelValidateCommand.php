@@ -186,6 +186,33 @@ class ModelValidateCommand extends Command
                     throw new \LogicException('['.$modelName.'] Missed attribute in the attribute names: ' . implode(', ', $diff));
                 }
 
+            } elseif ($name == 'jsonNested') {
+
+                foreach ((array) $value as $item) {
+                    $diff = array_diff(array_keys($item), ['jsonb', 'nullable', 'types', 'sorts', 'lists', 'purges']);
+                    if ($diff) {
+                        throw new \LogicException('['.$modelName.'] Unsupported options: ' . implode(', ', $diff));
+                    }
+
+                    $checks = [];
+                    $checks = array_merge($checks, array_keys($item['types'] ?? []));
+                    $checks = array_merge($checks, ($item['sorts'] ?? []));
+                    $checks = array_merge($checks, ($item['lists'] ?? []));
+                    $checks = array_merge($checks, ($item['purges'] ?? []));
+
+                    foreach ($checks as $path) {
+                        $path = explode('.', $path);
+
+                        if ($path[0] != '$') {
+                            throw new \LogicException(
+                                '['.$modelName.'] JsonPath must starts with "$.<path>". Given: '.implode('.', $path)
+                            );
+                        }
+                    }
+                }
+
+                $collection = array_merge($collection, array_keys($value));
+
             } else {
 
                 if (count($value) != count(array_unique($value, SORT_REGULAR))) {
