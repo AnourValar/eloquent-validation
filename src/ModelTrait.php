@@ -646,13 +646,13 @@ trait ModelTrait
     public function extractAttributesListFromConfiguration(): array
     {
         $attributes = [
-            'trim' => (array) ($this->trim ?? null),
-            'nullable' => (array) ($this->nullable ?? null),
-            'hidden' => (array) ($this->hidden ?? null),
+            'trim' => ($this->trim ?? null),
+            'nullable' => ($this->nullable ?? null),
+            'hidden' => ($this->hidden ?? null),
             'attributes' => array_keys($this->attributes),
-            'computed' => (array) ($this->computed ?? null),
-            'unchangeable' => (array) ($this->unchangeable ?? null),
-            'unique' => (array) ($this->unique ?? null),
+            'computed' => ($this->computed ?? null),
+            'unchangeable' => ($this->unchangeable ?? null),
+            'unique' => ($this->unique ?? null),
             'jsonNested' => ($this->jsonNested ?? null),
             'attribute_names' => array_keys($this->getAttributeNames()),
         ];

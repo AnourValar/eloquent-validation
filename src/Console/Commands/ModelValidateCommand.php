@@ -157,6 +157,10 @@ class ModelValidateCommand extends Command
         $collection = [];
 
         foreach ($model->extractAttributesListFromConfiguration() as $name => $value) {
+            if (! is_array($value)) {
+                throw new \LogicException("$name is not set");
+            }
+
             if ($name == 'unique') {
 
                     $flat = [];
@@ -188,7 +192,7 @@ class ModelValidateCommand extends Command
 
             } elseif ($name == 'jsonNested') {
 
-                foreach ((array) $value as $item) {
+                foreach ($value as $item) {
                     $diff = array_diff(array_keys($item), ['jsonb', 'nullable', 'types', 'sorts', 'lists', 'purges']);
                     if ($diff) {
                         throw new \LogicException('['.$modelName.'] Unsupported options: ' . implode(', ', $diff));
