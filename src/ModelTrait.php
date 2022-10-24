@@ -22,13 +22,6 @@ trait ModelTrait
     private static $attributeNames;
 
     /**
-     * Available attributes without explicit presence
-     *
-     * @var array
-     */
-    protected $nonStrictAttributes = ['is_actual', 'attributes', 'optgroup'];
-
-    /**
      * Get the validation rules
      *
      * @return array
@@ -70,8 +63,7 @@ trait ModelTrait
     public function setAttribute($key, $value)
     {
         if (
-            \App::hasDebugModeEnabled()
-            && ! in_array($key, $this->nonStrictAttributes)
+            ! \App::isProduction()
             && ! strpos($key, '_count')
             && ! strpos($key, '_max')
             && ! strpos($key, '_min')
@@ -112,27 +104,6 @@ trait ModelTrait
         $value = $this->setJsonNested($value, ($this->getJsonNested()[$key] ?? null));
 
         return parent::setAttribute($key, $value);
-    }
-
-    /**
-     * @see \Illuminate\Database\Eloquent\Model
-     *
-     * @param string $key
-     * @return mixed
-     */
-    public function getRelationValue($key)
-    {
-        // @TODO: Model::preventAccessingMissingAttributes() ?
-        if (
-            \App::hasDebugModeEnabled()
-            && ! in_array($key, $this->nonStrictAttributes)
-            && ! $this->relationLoaded($key)
-            && ! $this->isRelation($key)
-        ) {
-            throw new \LogicException('Unexpected attribute "'.$key.'" was "get".');
-        }
-
-        return parent::getRelationValue($key);
     }
 
     /**
