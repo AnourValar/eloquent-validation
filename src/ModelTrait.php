@@ -311,7 +311,7 @@ trait ModelTrait
 
         $this->appends = [];
         foreach ($args as $arg) {
-            if (! $this->hasCast($arg)) {
+            if (! $this->hasCast($arg) && ($this->hasGetMutator($arg) || $this->hasAttributeGetMutator($arg))) {
                 $this->appends[] = $arg;
             }
         }
