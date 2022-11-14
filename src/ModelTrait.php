@@ -290,11 +290,24 @@ trait ModelTrait
     }
 
     /**
-     * Scope-access for "visible" & "appends"
+     * Scope-access for "visible" & "appends" (set)
      *
      * @return void
      */
     public function scopePublishFields()
+    {
+        $this->visible = [];
+        $this->appends = [];
+
+        $this->scopeAddPublishFields(...func_get_args());
+    }
+
+    /**
+     * Scope-access for "visible" & "appends" (append)
+     *
+     * @return void
+     */
+    public function scopeAddPublishFields()
     {
         $args = func_get_args();
         array_shift($args);
@@ -307,9 +320,8 @@ trait ModelTrait
             $args = $args[0];
         }
 
-        $this->visible = $args;
+        $this->visible = array_merge($this->visible, $args);
 
-        $this->appends = [];
         foreach ($args as $arg) {
             if (! $this->hasCast($arg) && ($this->hasGetMutator($arg) || $this->hasAttributeGetMutator($arg))) {
                 $this->appends[] = $arg;

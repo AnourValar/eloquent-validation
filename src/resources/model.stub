@@ -68,7 +68,7 @@ class DummyClass extends Model
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var array
+     * @var array<string>
      */
     protected $hidden = [
         'updated_at',
@@ -164,7 +164,6 @@ class DummyClass extends Model
      */
     public function saveAfterValidation(\Illuminate\Validation\Validator $validator): void
     {
-        //$data = $validator->getData();
         //$validator->errors()->add('id', trans('models/DummyClass.id_not_exists'));
     }
 
