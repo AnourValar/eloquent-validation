@@ -292,25 +292,25 @@ trait ModelTrait
     /**
      * Scope-helper to set "visible", "appends"
      *
-     * @return mixed
+     * @return void
      */
     public function scopePublishFields()
     {
         $this->visible = [];
         $this->appends = [];
 
-        return $this->scopeAddPublishFields(...func_get_args());
+        $this->scopeAddPublishFields(...func_get_args());
     }
 
     /**
      * Scope-helper to append "visible", "appends"
      *
-     * @return mixed
+     * @return void
      */
     public function scopeAddPublishFields()
     {
         $args = func_get_args();
-        $query = array_shift($args);
+        array_shift($args);
 
         if (! isset($args[0])) {
             $args[0] = [];
@@ -327,16 +327,6 @@ trait ModelTrait
                 $this->appends[] = $arg;
             }
         }
-
-        if ($this->exists) {
-            uksort($this->attributes, function ($a, $b) {
-                return array_search($a, $this->visible) <=> array_search($b, $this->visible);
-            });
-
-            return $this;
-        }
-
-        return $query;
     }
 
     /**
