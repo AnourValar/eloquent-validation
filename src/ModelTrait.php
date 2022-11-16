@@ -310,7 +310,7 @@ trait ModelTrait
     public function scopeAddPublishFields()
     {
         $args = func_get_args();
-        array_shift($args);
+        $query = array_shift($args);
 
         if (! isset($args[0])) {
             $args[0] = [];
@@ -327,17 +327,25 @@ trait ModelTrait
                 $this->appends[] = $arg;
             }
         }
+
+        if ($this->exists && ($columns = $query->getQuery()->columns)) {
+            uksort($this->attributes, function ($a, $b) use ($columns) {
+                return array_search($a, $columns) <=> array_search($b, $columns);
+            });
+        }
     }
 
     /**
      * Determine if the user has the given abilities related to the entity.
      *
-     * @param  iterable|string  $abilities
-     * @return \Illuminate\Support\HigherOrderTapProxy
+     * @param  iterable|string|null  $abilities
+     * @return \Illuminate\Support\HigherOrderTapProxy<\Illuminate\Database\Eloquent\Model>
      */
     public function authorize($abilities)
     {
-        app(\Illuminate\Contracts\Auth\Access\Gate::class)->authorize($abilities, $this);
+        if (isset($abilities)) {
+            app(\Illuminate\Contracts\Auth\Access\Gate::class)->authorize($abilities, $this);
+        }
 
         return tap($this);
     }
