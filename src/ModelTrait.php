@@ -247,7 +247,7 @@ trait ModelTrait
      * @param mixed $ids
      * @return void
      */
-    public function scopeTrashedOrNot(\Illuminate\Database\Eloquent\Builder $builder, mixed $ids)
+    public function scopeWithoutTrashedOr(\Illuminate\Database\Eloquent\Builder $builder, mixed $ids)
     {
         if (! in_array(\Illuminate\Database\Eloquent\SoftDeletes::class, class_uses($builder->getModel()))) {
             throw new \LogicException('Incorrect usage.');
