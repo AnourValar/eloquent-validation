@@ -166,6 +166,10 @@ class ValidatorHelper
         if (is_array($value)) {
             foreach ($value as &$item) {
                 $item = $this->mutateArrayNullable($item);
+
+                if ($item === []) {
+                    $item = null;
+                }
             }
             unset($item);
         }

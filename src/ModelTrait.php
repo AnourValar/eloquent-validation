@@ -83,6 +83,8 @@ trait ModelTrait
             $value = $this->setTrim($value);
         }
 
+        $value = $this->setJsonNested($value, ($this->getJsonNested()[$key] ?? null));
+
         if (isset($this->nullable) && in_array($key, $this->nullable)) {
             $value = $this->setNull($value);
         }
@@ -100,8 +102,6 @@ trait ModelTrait
                 return $this;
             }
         }
-
-        $value = $this->setJsonNested($value, ($this->getJsonNested()[$key] ?? null));
 
         return parent::setAttribute($key, $value);
     }
