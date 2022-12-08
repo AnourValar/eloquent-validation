@@ -723,7 +723,7 @@ trait ModelTrait
      */
     private function setNull($value)
     {
-        if ((is_string($value) && trim($value) === '') || (is_array($value) && ! count($value))) {
+        if ((is_string($value) && trim($value) === '') || $value === []) {
             return null;
         }
 
@@ -743,14 +743,17 @@ trait ModelTrait
             return $value;
         }
 
-        if (! empty($rules['nullable'])) {
-            $value = (new ValidatorHelper())->mutateArrayNullable($value);
-        }
-
-        if (! empty($rules['types']) || ! empty($rules['sorts']) || ! empty($rules['lists']) || ! empty($rules['purges'])) {
+        if (
+            ! empty($rules['nullable'])
+            || ! empty($rules['types'])
+            || ! empty($rules['sorts'])
+            || ! empty($rules['lists'])
+            || ! empty($rules['purges'])
+        ) {
             $value = ['$' => $value];
             $value = (new ValidatorHelper())->mutateArray(
                 $value,
+                ($rules['nullable'] ?? null),
                 ($rules['types'] ?? null),
                 ($rules['sorts'] ?? null),
                 ($rules['lists'] ?? null),

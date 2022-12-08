@@ -44,6 +44,7 @@ class ValidatorHelper
      * JSON mutator: casts & sorts
      *
      * @param mixed $value
+     * @param array $nullable
      * @param array $types
      * @param array $sorts
      * @param array $lists
@@ -53,7 +54,8 @@ class ValidatorHelper
      */
     public function mutateArray(
         mixed $value,
-        ?array $types,
+        ?array $nullable = null,
+        ?array $types = null,
         array $sorts = null,
         array $lists = null,
         array $purges = null,
@@ -63,8 +65,20 @@ class ValidatorHelper
             foreach ($value as $key => $item) {
                 $path = array_merge($parentKeys, [$key]);
 
+                if ($parentKeys && ( (is_string($item) && trim($item) === '') || $item === [] )) {
+                    foreach ((array) $nullable as $nullableKey) {
+                        if (! $this->isMatching($nullableKey, $path)) {
+                            continue;
+                        }
+
+                        $item = null;
+                        $value[$key] = $item;
+                        break;
+                    }
+                }
+
                 if (is_array($item)) {
-                    $value[$key] = $this->mutateArray($value[$key], $types, $sorts, $lists, $purges, $path);
+                    $value[$key] = $this->mutateArray($value[$key], $nullable, $types, $sorts, $lists, $purges, $path);
 
                     foreach ((array) $sorts as $sortKey) {
                         if (! $this->isMatching($sortKey, $path)) {
@@ -152,32 +166,6 @@ class ValidatorHelper
     }
 
     /**
-     * JSON mutator: '' => null
-     *
-     * @param mixed $value
-     * @return mixed
-     */
-    public function mutateArrayNullable(mixed $value): mixed
-    {
-        if (is_string($value) && trim($value) === '') {
-            $value = null;
-        }
-
-        if (is_array($value)) {
-            foreach ($value as &$item) {
-                $item = $this->mutateArrayNullable($item);
-
-                if ($item === []) {
-                    $item = null;
-                }
-            }
-            unset($item);
-        }
-
-        return $value;
-    }
-
-    /**
      * Check if the key matches to the path
      *
      * @param string $key
@@ -186,6 +174,10 @@ class ValidatorHelper
      */
     public function isMatching(string $key, array $path): bool
     {
+        if ($key == '*') {
+            return true;
+        }
+
         $key = explode('.', $key);
 
         if (count($key) != count($path)) {

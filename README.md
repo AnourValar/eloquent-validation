@@ -64,7 +64,7 @@ class UserPhone extends Model
     ];
 
     /**
-     * '' => null convertation
+     * '',[] => null convertation
      * 
      * @var array
      */
