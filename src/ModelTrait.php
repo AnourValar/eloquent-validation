@@ -253,6 +253,8 @@ trait ModelTrait
             throw new \LogicException('Incorrect usage.');
         }
 
+        $ids = array_filter((array) $ids);
+
         if (! $ids) {
             return;
         }
@@ -262,7 +264,7 @@ trait ModelTrait
             ->where(function ($query) use ($ids) {
                 $query
                     ->whereNull($this->getDeletedAtColumn())
-                    ->orWhereIn($this->getKeyName(), (array) $ids);
+                    ->orWhereIn($this->getKeyName(), $ids);
             });
     }
 
