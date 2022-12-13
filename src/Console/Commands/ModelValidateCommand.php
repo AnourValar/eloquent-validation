@@ -193,7 +193,7 @@ class ModelValidateCommand extends Command
             } elseif ($name == 'jsonNested') {
 
                 foreach ($value as $item) {
-                    $diff = array_diff(array_keys($item), ['jsonb', 'nullable', 'types', 'sorts', 'lists', 'purges']);
+                    $diff = array_diff(array_keys($item), ['jsonb', 'nullable', 'purges', 'types', 'sorts', 'lists']);
                     if ($diff) {
                         throw new \LogicException('['.$modelName.'] Unsupported options: ' . implode(', ', $diff));
                     }
