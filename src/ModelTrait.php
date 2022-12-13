@@ -747,19 +747,19 @@ trait ModelTrait
 
         if (
             ! empty($rules['nullable'])
+            || ! empty($rules['purges'])
             || ! empty($rules['types'])
             || ! empty($rules['sorts'])
             || ! empty($rules['lists'])
-            || ! empty($rules['purges'])
         ) {
             $value = ['$' => $value];
             $value = (new ValidatorHelper())->mutateArray(
                 $value,
                 ($rules['nullable'] ?? null),
+                ($rules['purges'] ?? null),
                 ($rules['types'] ?? null),
                 ($rules['sorts'] ?? null),
-                ($rules['lists'] ?? null),
-                ($rules['purges'] ?? null)
+                ($rules['lists'] ?? null)
             );
             $value = $value['$'];
         }

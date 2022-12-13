@@ -45,20 +45,20 @@ class ValidatorHelper
      *
      * @param mixed $value
      * @param array $nullable
+     * @param array $purges
      * @param array $types
      * @param array $sorts
      * @param array $lists
-     * @param array $purges
      * @param array $parentKeys
      * @return mixed
      */
     public function mutateArray(
         mixed $value,
         ?array $nullable = null,
+        array $purges = null,
         ?array $types = null,
         array $sorts = null,
         array $lists = null,
-        array $purges = null,
         array $parentKeys = []
     ): mixed {
         if (is_array($value)) {
@@ -78,7 +78,7 @@ class ValidatorHelper
                 }
 
                 if (is_array($item)) {
-                    $value[$key] = $this->mutateArray($value[$key], $nullable, $types, $sorts, $lists, $purges, $path);
+                    $value[$key] = $this->mutateArray($value[$key], $nullable, $purges, $types, $sorts, $lists, $path);
 
                     foreach ((array) $sorts as $sortKey) {
                         if (! $this->isMatching($sortKey, $path)) {
@@ -98,6 +98,17 @@ class ValidatorHelper
                         break;
                     }
                 } else {
+                    if ($parentKeys && is_null($item)) {
+                        foreach ((array) $purges as $purgeKey) {
+                            if (! $this->isMatching($purgeKey, $path)) {
+                                continue;
+                            }
+
+                            unset($value[$key]);
+                            continue 2;
+                        }
+                    }
+
                     foreach ((array) $types as $typeKey => $cast) {
                         if (! $this->isMatching($typeKey, $path)) {
                             continue;
@@ -114,17 +125,6 @@ class ValidatorHelper
                         if ($cast) {
                             settype($item, $cast);
                             $value[$key] = $item;
-                        }
-                    }
-
-                    if ($parentKeys && is_null($item)) {
-                        foreach ((array) $purges as $purgeKey) {
-                            if (! $this->isMatching($purgeKey, $path)) {
-                                continue;
-                            }
-
-                            unset($value[$key]);
-                            break;
                         }
                     }
                 }
