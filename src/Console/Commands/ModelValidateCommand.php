@@ -199,17 +199,16 @@ class ModelValidateCommand extends Command
                     }
 
                     $checks = [];
+                    $checks = array_merge($checks, ($item['nullable'] ?? []));
+                    $checks = array_merge($checks, ($item['purges'] ?? []));
                     $checks = array_merge($checks, array_keys($item['types'] ?? []));
                     $checks = array_merge($checks, ($item['sorts'] ?? []));
                     $checks = array_merge($checks, ($item['lists'] ?? []));
-                    $checks = array_merge($checks, ($item['purges'] ?? []));
 
                     foreach ($checks as $path) {
-                        $path = explode('.', $path);
-
-                        if ($path[0] != '$') {
+                        if ($path != '*' && explode('.', $path)[0] != '$') {
                             throw new \LogicException(
-                                '['.$modelName.'] JsonPath must starts with "$.<path>". Given: '.implode('.', $path)
+                                '['.$modelName.'] JsonPath must starts with "$.<path>". Given: ' . $path
                             );
                         }
                     }
