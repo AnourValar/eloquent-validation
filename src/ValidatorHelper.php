@@ -117,7 +117,7 @@ class ValidatorHelper
                         }
                     }
 
-                    if (is_null($item)) {
+                    if ($parentKeys && is_null($item)) {
                         foreach ((array) $purges as $purgeKey) {
                             if (! $this->isMatching($purgeKey, $path)) {
                                 continue;
