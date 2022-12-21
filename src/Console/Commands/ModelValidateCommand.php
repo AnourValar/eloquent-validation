@@ -227,7 +227,7 @@ class ModelValidateCommand extends Command
             }
         }
 
-        $diff = array_diff($collection, array_keys($model->getCasts()));
+        $diff = array_unique(array_diff($collection, array_keys($model->getCasts())));
         if ($diff) {
             throw new \LogicException('['.$modelName.'] Unrepresented attribute in the casts: ' . implode(', ', $diff));
         }
