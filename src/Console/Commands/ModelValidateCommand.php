@@ -212,6 +212,14 @@ class ModelValidateCommand extends Command
                             );
                         }
                     }
+
+                    foreach (($item['types'] ?? []) as $type) {
+                        if ($type != mb_strtolower($type)) {
+                            throw new \LogicException(
+                                '['.$modelName.'] JsonPath type must be in lower case. Given: ' . $type
+                            );
+                        }
+                    }
                 }
 
                 $collection = array_merge($collection, array_keys($value));

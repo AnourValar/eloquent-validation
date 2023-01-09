@@ -123,6 +123,14 @@ class ValidatorHelper
                         }
 
                         if ($cast) {
+                            if (in_array($cast, ['int', 'float', 'double']) && $item !== null && $item !== '' && ! is_numeric($item)) {
+                                continue;
+                            }
+
+                             if (in_array($cast, ['bool']) && ! in_array($item, [true, false, 0, 1, '0', '1', '', null], true)) {
+                                continue;
+                            }
+
                             settype($item, $cast);
                             $value[$key] = $item;
                         }
