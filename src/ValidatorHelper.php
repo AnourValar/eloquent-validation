@@ -65,20 +65,9 @@ class ValidatorHelper
             foreach ($value as $key => $item) {
                 $path = array_merge($parentKeys, [$key]);
 
-                if ($parentKeys && ( (is_string($item) && trim($item) === '') || $item === [] )) {
-                    foreach ((array) $nullable as $nullableKey) {
-                        if (! $this->isMatching($nullableKey, $path)) {
-                            continue;
-                        }
-
-                        $item = null;
-                        $value[$key] = $item;
-                        break;
-                    }
-                }
-
                 if (is_array($item)) {
-                    $value[$key] = $this->mutateArray($value[$key], $nullable, $purges, $types, $sorts, $lists, $path);
+                    $item = $this->mutateArray($value[$key], $nullable, $purges, $types, $sorts, $lists, $path);
+                    $value[$key] = $item;
 
                     foreach ((array) $sorts as $sortKey) {
                         if (! $this->isMatching($sortKey, $path)) {
@@ -97,7 +86,21 @@ class ValidatorHelper
                         $value[$key] = array_values($value[$key]);
                         break;
                     }
-                } else {
+                }
+
+                if ($parentKeys && ( (is_string($item) && trim($item) === '') || $item === [] )) {
+                    foreach ((array) $nullable as $nullableKey) {
+                        if (! $this->isMatching($nullableKey, $path)) {
+                            continue;
+                        }
+
+                        $item = null;
+                        $value[$key] = $item;
+                        break;
+                    }
+                }
+
+                if (! is_array($item)) {
                     if ($parentKeys && is_null($item)) {
                         foreach ((array) $purges as $purgeKey) {
                             if (! $this->isMatching($purgeKey, $path)) {
