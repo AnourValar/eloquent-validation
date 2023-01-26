@@ -74,7 +74,7 @@ class ValidatorHelper
                             continue;
                         }
 
-                        sort($value[$key]);
+                        asort($value[$key]);
                         break;
                     }
 
