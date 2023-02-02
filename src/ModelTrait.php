@@ -107,6 +107,17 @@ trait ModelTrait
     }
 
     /**
+     * @see \Illuminate\Database\Eloquent\Concerns\HasAttributes::asJson()
+     *
+     * @param  mixed  $value
+     * @return string
+     */
+    protected function asJson($value)
+    {
+        return json_encode($value, JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
      * Save validation
      *
      * @param mixed $prefix
