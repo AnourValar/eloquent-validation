@@ -83,7 +83,7 @@ trait ModelTrait
             $value = $this->setTrim($value);
         }
 
-        $value = $this->setJsonNested($value, ($this->getJsonNested()[$key] ?? null));
+        $value = $this->setJsonNested($value, $key);
 
         if (isset($this->nullable) && in_array($key, $this->nullable)) {
             $value = $this->setNull($value);
@@ -747,11 +747,12 @@ trait ModelTrait
      * Handle "jsonNested"
      *
      * @param mixed $value
-     * @param array $rules
+     * @param string $key
      * @return mixed
      */
-    private function setJsonNested($value, array $rules = null)
+    private function setJsonNested($value, $key)
     {
+        $rules = ($this->getJsonNested()[$key] ?? null);
         if (! $rules) {
             return $value;
         }
@@ -763,6 +764,14 @@ trait ModelTrait
             || ! empty($rules['sorts'])
             || ! empty($rules['lists'])
         ) {
+            if (isset($this->nullable) && in_array($key, $this->nullable)) {
+                $value = $this->setNull($value);
+            }
+
+            if (! isset($value)) {
+                return $value;
+            }
+
             $value = ['$' => $value];
             $value = (new ValidatorHelper())->mutateArray(
                 $value,
