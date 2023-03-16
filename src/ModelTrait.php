@@ -114,7 +114,7 @@ trait ModelTrait
      */
     protected function asJson($value)
     {
-        return json_encode($value, JSON_UNESCAPED_UNICODE);
+        return json_encode($value, JSON_UNESCAPED_UNICODE); // for "json" columns
     }
 
     /**
@@ -415,14 +415,9 @@ trait ModelTrait
             // model lang
             $value[$locale] = $this->getAttributeNamesFromModelLang();
 
-            // validation.attributes
-            if (! $value[$locale]) {
-                $casts = array_keys($this->getCasts());
-                foreach ((array) trans('validation.attributes') as $attrName => $attrValue) {
-                    if (in_array($attrName, $casts)) {
-                        $value[$locale][$attrName] = $attrValue;
-                    }
-                }
+            // handler lang
+            if (method_exists($this, 'getAttributeNamesFromHandler')) {
+                $value[$locale] = array_replace($this->getAttributeNamesFromHandler(), $value[$locale]);
             }
 
             static::$attributeNames = &$value;
@@ -493,7 +488,7 @@ trait ModelTrait
             if (array_key_exists($name, $newAttributes) && ! $this->originalIsEquivalent($name, $newAttributes[$name])) {
                 $validator->errors()->add(
                     $name,
-                    trans($translate, ['attribute' => $validator->customAttributes[$name] ?? $name])
+                    trans($translate, ['attribute' => $validator->getDisplayableAttribute($name)])
                 );
             }
         }
@@ -540,7 +535,7 @@ trait ModelTrait
                 $params = ['attributes' => []];
                 $key = null;
                 foreach ($unique as $field) {
-                    $params['attributes'][] = $validator->customAttributes[$field] ?? $field;
+                    $params['attributes'][] = $validator->getDisplayableAttribute($field);
 
                     if (! isset($key)) {
                         $key = $field;
