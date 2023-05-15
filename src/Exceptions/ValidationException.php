@@ -13,6 +13,10 @@ class ValidationException extends \Illuminate\Validation\ValidationException
      */
     public function __construct($validator, $response = null, $errorBag = 'default', $prefix = null)
     {
+        if (is_string($validator)) {
+            $validator = trans($validator);
+        }
+
         $prefix = $this->canonizePrefix($prefix);
 
         if ($validator instanceof \Illuminate\Validation\Validator) {

@@ -226,7 +226,7 @@ class CrudService
         if (is_array($prefix)) {
             $prefix[] = $key;
         } else {
-            if (mb_strlen($prefix)) {
+            if (mb_strlen((string) $prefix)) {
                 $prefix .= '.';
             }
 
