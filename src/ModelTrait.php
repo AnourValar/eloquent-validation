@@ -107,6 +107,28 @@ trait ModelTrait
     }
 
     /**
+     * @see \Illuminate\Database\Eloquent\Model
+     *
+     * @param string $key
+     * @return mixed
+     * @throws \Illuminate\Database\Eloquent\MissingAttributeException
+     */
+    public function getAttribute($key)
+    {
+        if (
+            ! \App::isProduction()
+            && $this->exists
+            && ! $this->wasRecentlyCreated
+            && array_key_exists($key, $this->casts)
+            && ! array_key_exists($key, $this->attributes)
+        ) {
+            throw new \Illuminate\Database\Eloquent\MissingAttributeException($this, $key);
+        }
+
+        return parent::getAttribute($key);
+    }
+
+    /**
      * @see \Illuminate\Database\Eloquent\Concerns\HasAttributes::asJson()
      *
      * @param  mixed  $value
