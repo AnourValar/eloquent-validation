@@ -373,13 +373,14 @@ trait ModelTrait
     /**
      * Determine if the user has the given abilities related to the entity.
      *
-     * @param  iterable|string|null  $abilities
+     * @param iterable|string|null  $abilities
+     * @param string $relation = null
      * @return \Illuminate\Support\HigherOrderTapProxy<\Illuminate\Database\Eloquent\Model>
      */
-    public function authorize($abilities)
+    public function authorize($abilities, string $relation = null)
     {
         if (isset($abilities)) {
-            app(\Illuminate\Contracts\Auth\Access\Gate::class)->authorize($abilities, $this);
+            app(\Illuminate\Contracts\Auth\Access\Gate::class)->authorize($abilities, ($relation ? $this->$relation : $this));
         }
 
         return tap($this);
@@ -736,7 +737,7 @@ trait ModelTrait
      */
     protected function mutateMerge(string $attribute, $value): array
     {
-        $this->$attribute =  array_merge((array) $this->$attribute, (array) $value);
+        $this->$attribute = array_merge((array) $this->$attribute, (array) $value);
         return [$attribute => $this->getAttributes()[$attribute]];
     }
 
@@ -749,7 +750,7 @@ trait ModelTrait
      */
     protected function mutateDiff(string $attribute, $value): array
     {
-        $this->$attribute =  array_diff((array) $this->$attribute, (array) $value);
+        $this->$attribute = array_diff((array) $this->$attribute, (array) $value);
         return [$attribute => $this->getAttributes()[$attribute]];
     }
 
