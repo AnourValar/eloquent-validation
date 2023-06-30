@@ -728,6 +728,32 @@ trait ModelTrait
     }
 
     /**
+     * Merge mutator
+     *
+     * @param string $attribute
+     * @param mixed $value
+     * @return array
+     */
+    protected function mutateMerge(string $attribute, $value): array
+    {
+        $this->$attribute =  array_merge((array) $this->$attribute, (array) $value);
+        return [$attribute => $this->getAttributes()[$attribute]];
+    }
+
+    /**
+     * Diff mutator
+     *
+     * @param string $attribute
+     * @param mixed $value
+     * @return array
+     */
+    protected function mutateDiff(string $attribute, $value): array
+    {
+        $this->$attribute =  array_diff((array) $this->$attribute, (array) $value);
+        return [$attribute => $this->getAttributes()[$attribute]];
+    }
+
+    /**
      * @param mixed $value
      * @return mixed
      */
