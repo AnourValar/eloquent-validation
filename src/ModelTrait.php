@@ -373,14 +373,21 @@ trait ModelTrait
     /**
      * Determine if the user has the given abilities related to the entity.
      *
-     * @param iterable|string|null  $abilities
-     * @param string $relation = null
+     * @param iterable|string|null $abilities
+     * @param string|null $relation
      * @return \Illuminate\Support\HigherOrderTapProxy<\Illuminate\Database\Eloquent\Model>
      */
     public function authorize($abilities, string $relation = null)
     {
         if (isset($abilities)) {
-            app(\Illuminate\Contracts\Auth\Access\Gate::class)->authorize($abilities, ($relation ? $this->$relation : $this));
+            $arg = $this;
+            if ($relation) {
+                foreach (explode('.', $relation) as $item) {
+                    $arg = $arg->$item;
+                }
+            }
+
+            app(\Illuminate\Contracts\Auth\Access\Gate::class)->authorize($abilities, $arg);
         }
 
         return tap($this);
