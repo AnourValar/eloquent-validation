@@ -18,7 +18,10 @@ trait ValidationTrait
 
             return tap($model);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            $this->assertFalse(true, 'Validation failed: ' . json_encode($e->validator->errors()->toArray()));
+            $this->assertFalse(
+                true,
+                'Validation failed: ' . json_encode($e->validator->errors()->toArray(), JSON_UNESCAPED_UNICODE)
+            );
             throw $e;
         }
     }
