@@ -1,0 +1,96 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ namespacedModel }};
+
+class {{ class }}
+{
+    /**
+     * Handle the "saving" event.
+     *
+     * @param \{{ namespacedModel }} $model
+     * @return mixed
+     */
+    public function saving({{ model }} $model)
+    {
+
+    }
+
+    /**
+     * Handle the "creating" event.
+     *
+     * @param \{{ namespacedModel }} $model
+     * @return mixed
+     */
+    public function creating({{ model }} $model)
+    {
+
+    }
+
+    /**
+     * Handle the "updating" event.
+     *
+     * @param \{{ namespacedModel }} $model
+     * @return mixed
+     */
+    public function updating({{ model }} $model)
+    {
+
+    }
+
+    /**
+     * Handle the "created" event.
+     *
+     * @param \{{ namespacedModel }} $model
+     * @return void
+     */
+    public function created({{ model }} $model)
+    {
+
+    }
+
+    /**
+     * Handle the "updated" event.
+     *
+     * @param \{{ namespacedModel }} $model
+     * @return void
+     */
+    public function updated({{ model }} $model)
+    {
+
+    }
+
+    /**
+     * Handle the "saved" event.
+     *
+     * @param \{{ namespacedModel }} $model
+     * @return void
+     */
+    public function saved({{ model }} $model)
+    {
+
+    }
+
+    /**
+     * Handle the "deleting" event.
+     *
+     * @param \{{ namespacedModel }} $model
+     * @return mixed
+     */
+    public function deleting({{ model }} $model)
+    {
+
+    }
+
+    /**
+     * Handle the "deleted" event.
+     *
+     * @param \{{ namespacedModel }} $model
+     * @return void
+     */
+    public function deleted({{ model }} $model)
+    {
+
+    }
+}

@@ -40,6 +40,7 @@ class EloquentValidationServiceProvider extends ServiceProvider
             $this->commands([
                 \AnourValar\EloquentValidation\Console\Commands\ModelMakeCommand::class,
                 \AnourValar\EloquentValidation\Console\Commands\ModelValidateCommand::class,
+                \AnourValar\EloquentValidation\Console\Commands\ObserverMakeCommand::class,
             ]);
         }
     }
