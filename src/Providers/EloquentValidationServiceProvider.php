@@ -51,7 +51,7 @@ class EloquentValidationServiceProvider extends ServiceProvider
     private function addScalarRule(): void
     {
         \Validator::extend('scalar', function ($attribute, $value, $parameters, $validator) {
-            return ( is_scalar($value) || is_null($value) || (is_object($value) && method_exists($value, '__toString')) );
+            return (is_scalar($value) || is_null($value) || (is_object($value) && method_exists($value, '__toString')));
         });
 
         \Validator::replacer('scalar', function ($message, $attribute, $rule, $parameters, $validator) {
@@ -120,7 +120,7 @@ class EloquentValidationServiceProvider extends ServiceProvider
             }
             $parameters = array_unique($parameters);
 
-            return ( is_array($value) && ! array_diff_key($value, array_combine($parameters, $parameters)) );
+            return (is_array($value) && ! array_diff_key($value, array_combine($parameters, $parameters)));
         });
 
         \Validator::replacer('array_keys', function ($message, $attribute, $rule, $parameters, $validator) {
@@ -137,7 +137,7 @@ class EloquentValidationServiceProvider extends ServiceProvider
     private function addArrayKeysOnlyRule(): void
     {
         \Validator::extend('array_keys_only', function ($attribute, $value, $parameters, $validator) {
-            return ( is_array($value) && ! array_diff_key($value, array_combine($parameters, $parameters)) );
+            return (is_array($value) && ! array_diff_key($value, array_combine($parameters, $parameters)));
         });
 
         \Validator::replacer('array_keys_only', function ($message, $attribute, $rule, $parameters, $validator) {

@@ -88,7 +88,7 @@ class ValidatorHelper
                     }
                 }
 
-                if ($parentKeys && ( (is_string($item) && trim($item) === '') || $item === [] )) {
+                if ($parentKeys && ((is_string($item) && trim($item) === '') || $item === [])) {
                     foreach ((array) $nullable as $nullableKey) {
                         if (! $this->isMatching($nullableKey, $path)) {
                             continue;
@@ -130,7 +130,7 @@ class ValidatorHelper
                                 continue;
                             }
 
-                             if (in_array($cast, ['bool']) && ! in_array($item, [true, false, 0, 1, '0', '1', '', null], true)) {
+                            if (in_array($cast, ['bool']) && ! in_array($item, [true, false, 0, 1, '0', '1', '', null], true)) {
                                 continue;
                             }
 

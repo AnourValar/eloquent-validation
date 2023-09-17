@@ -46,7 +46,7 @@ class ModelValidateCommand extends Command
             $bar->setMessage($model);
 
             if (! $this->option('ignore-configuration')) {
-                $this->checkConfiguration(new $model);
+                $this->checkConfiguration(new $model());
             }
 
             foreach ($model::all() as $item) {
@@ -126,7 +126,7 @@ class ModelValidateCommand extends Command
         try {
             $model->validate();
         } catch (\Illuminate\Validation\ValidationException $e) {
-            dump( $e->validator->errors()->all(), $e->validator->getData() );
+            dump($e->validator->errors()->all(), $e->validator->getData());
             throw $e;
         }
     }
@@ -163,18 +163,18 @@ class ModelValidateCommand extends Command
 
             if ($name == 'unique') {
 
-                    $flat = [];
-                    foreach ($value as &$batch) {
-                        sort($batch);
-                        $flat = array_merge($flat, $batch);
-                    }
-                    unset($batch);
+                $flat = [];
+                foreach ($value as &$batch) {
+                    sort($batch);
+                    $flat = array_merge($flat, $batch);
+                }
+                unset($batch);
 
-                    if (count($value) != count(array_unique($value, SORT_REGULAR))) {
-                        throw new \LogicException("[$modelName] Duplicates for \"$name\"");
-                    }
+                if (count($value) != count(array_unique($value, SORT_REGULAR))) {
+                    throw new \LogicException("[$modelName] Duplicates for \"$name\"");
+                }
 
-                    $collection = array_merge($collection, $flat);
+                $collection = array_merge($collection, $flat);
 
             } elseif ($name == 'attribute_names') {
 

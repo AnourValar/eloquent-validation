@@ -1,0 +1,26 @@
+parameters:
+
+    paths:
+        - src
+
+    # The level 9 is the highest level
+    level: 5
+
+    ignoreErrors:
+        - '#Unsafe usage of new static\(\)#'
+        - '#Right side of \&\& is always false#'
+        - '#Call to static method#'
+        - '#Call to an undefined method#'
+
+    excludePaths:
+
+    checkFunctionNameCase: true
+    checkInternalClassCaseSensitivity: true
+    checkAlwaysTrueInstanceof: true
+    reportMaybesInMethodSignatures: true
+    reportStaticMethodSignatures: true
+    checkUninitializedProperties: true
+    checkDynamicProperties: true
+    reportAlwaysTrueInLastCondition: true
+    reportWrongPhpDocTypeInVarTag: true
+    checkMissingCallableSignature: true

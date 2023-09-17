@@ -463,7 +463,7 @@ trait ModelTrait
      */
     public function getComputed()
     {
-        return ( $this->computed ?? null );
+        return ($this->computed ?? null);
     }
 
     /**
@@ -473,7 +473,7 @@ trait ModelTrait
      */
     public function getUnchangeable()
     {
-        return ( $this->unchangeable ?? null );
+        return ($this->unchangeable ?? null);
     }
 
     /**
@@ -483,7 +483,7 @@ trait ModelTrait
      */
     public function getUnique()
     {
-        return ( $this->unique ?? null );
+        return ($this->unique ?? null);
     }
 
     /**
@@ -493,7 +493,7 @@ trait ModelTrait
      */
     public function getJsonNested()
     {
-        return ( $this->jsonNested ?? null );
+        return ($this->jsonNested ?? null);
     }
 
     /**
@@ -539,7 +539,7 @@ trait ModelTrait
         $newAttributes = $this->attributes;
 
         foreach ($uniques as $unique) {
-            $builder = new $this;
+            $builder = new $this();
 
             if (! $this->isDirty($unique) && $this->exists) {
                 continue;

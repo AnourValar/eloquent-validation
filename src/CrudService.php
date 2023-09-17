@@ -54,7 +54,7 @@ class CrudService
                 }
 
                 $counters['created'] += $model->create($query)->exists ? 1 : 0;
-            }  elseif (! empty($query['_delete'])) {
+            } elseif (! empty($query['_delete'])) {
                 // DELETE
                 $curr = null;
                 if (is_numeric($id)) {
