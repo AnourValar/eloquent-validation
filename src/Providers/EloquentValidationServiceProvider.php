@@ -30,6 +30,7 @@ class EloquentValidationServiceProvider extends ServiceProvider
         $this->addArrayKeysOnlyRule();
         $this->addNotEmpty();
         $this->addIsListRule();
+        $this->updateDefaultRules();
 
         // langs
         $this->loadTranslationsFrom(__DIR__.'/../resources/lang/', 'eloquent-validation');
@@ -183,6 +184,30 @@ class EloquentValidationServiceProvider extends ServiceProvider
                 'eloquent-validation::validation.is_list',
                 ['attribute' => $validator->getDisplayableAttribute($attribute)]
             );
+        });
+    }
+
+    /**
+     * @return void
+     */
+    private function updateDefaultRules(): void
+    {
+        \Validator::replacer('max', function ($message, $attribute, $rule, $parameters, $validator) {
+            $value = $parameters[0];
+            if (isset($parameters[1])) {
+                $value = trans($parameters[1]);
+            }
+
+            return str_replace(':max', $value, $message);
+        });
+
+        \Validator::replacer('min', function ($message, $attribute, $rule, $parameters, $validator) {
+            $value = $parameters[0];
+            if (isset($parameters[1])) {
+                $value = trans($parameters[1]);
+            }
+
+            return str_replace(':min', $value, $message);
         });
     }
 }
