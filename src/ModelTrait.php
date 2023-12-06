@@ -213,6 +213,15 @@ trait ModelTrait
             if ($passes && $validator->getRules()) {
                 $passes = $validator->passes();
             }
+
+            /*if ($passes && method_exists($this, 'saveActionValidation')) {
+                try {
+                    $this->saveActionValidation();
+                } catch (\Illuminate\Validation\ValidationException $e) {
+                    $passes = false;
+                    $validator = $e->validator;
+                }
+            }*/
         }
 
         if ($additionalAttributeNames) {
@@ -447,7 +456,7 @@ trait ModelTrait
 
             // handler lang
             if (method_exists($this, 'getAttributeNamesFromHandler')) {
-                $value[$locale] = array_replace($this->getAttributeNamesFromHandler(), $value[$locale]);
+                $value[$locale] = array_replace($value[$locale], $this->getAttributeNamesFromHandler());
             }
 
             static::$attributeNames = &$value;
