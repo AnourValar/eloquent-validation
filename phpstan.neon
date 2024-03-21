@@ -8,7 +8,6 @@ parameters:
 
     ignoreErrors:
         - '#Unsafe usage of new static\(\)#'
-        - '#Right side of \&\& is always false#'
         - '#Call to static method#'
         - '#Call to an undefined method#'
 

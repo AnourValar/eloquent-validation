@@ -8,13 +8,6 @@ use Illuminate\Support\Str;
 trait ModelTrait
 {
     /**
-     * Raw validation rules for all attributes
-     *
-     * @var mixed
-     */
-    private $rawRules = 'scalar';
-
-    /**
      * Attribute names
      *
      * @var array|null
@@ -60,6 +53,7 @@ trait ModelTrait
      * @param  mixed  $value
      * @return mixed
      */
+    #[\Override]
     public function setAttribute($key, $value)
     {
         if (
@@ -112,6 +106,7 @@ trait ModelTrait
      * @param  mixed  $value
      * @return string
      */
+    #[\Override]
     protected function asJson($value)
     {
         return json_encode($value, JSON_UNESCAPED_UNICODE); // for "json" columns
@@ -132,23 +127,16 @@ trait ModelTrait
             $this->setAttributeNames(array_replace($defaultAttributeNames, $additionalAttributeNames));
         }
 
-        // Raw rules
-        $validator = \Validator::make($this->attributes, array_fill_keys(array_keys($this->attributes), $this->rawRules));
-        $validator->setAttributeNames($this->getAttributeNames());
-        $passes = $validator->passes();
-
         // Rules
-        if ($passes) {
-            $attributes = $this->getAttributesForValidation();
+        $attributes = $this->getAttributesForValidation();
 
-            $validator = \Validator::make($attributes, $this->canonizedRules());
-            if ($additionalRules) {
-                $validator->addRules($additionalRules);
-            }
-            $validator->setAttributeNames($this->getAttributeNames());
-
-            $passes = $validator->passes();
+        $validator = \Validator::make($attributes, $this->canonizedRules());
+        if ($additionalRules) {
+            $validator->addRules($additionalRules);
         }
+        $validator->setAttributeNames($this->getAttributeNames());
+
+        $passes = $validator->passes();
 
         // Handles
         if ($passes) {
@@ -387,6 +375,7 @@ trait ModelTrait
      * @param  bool  $exists
      * @return static
      */
+    #[\Override]
     public function newInstance($attributes = [], $exists = false)
     {
         $model = parent::newInstance([], $exists);
@@ -628,6 +617,22 @@ trait ModelTrait
         unset($fieldRules);
 
         return $rules;
+    }
+
+    /**
+     * @see \Illuminate\Database\Eloquent\Model::asDateTime()
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    #[\Override]
+    protected function asDateTime($value)
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+
+        return parent::asDateTime($value);
     }
 
     /**

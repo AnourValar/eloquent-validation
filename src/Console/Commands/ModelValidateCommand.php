@@ -126,6 +126,7 @@ class ModelValidateCommand extends Command
         try {
             $model->validate();
         } catch (\Illuminate\Validation\ValidationException $e) {
+            /** @psalm-suppress ForbiddenCode */
             dump($e->validator->errors()->all(), $e->validator->getData());
             throw $e;
         }
