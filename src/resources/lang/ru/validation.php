@@ -5,7 +5,6 @@ return [
     'config' => 'Поле :attribute должно содержать значение из справочника.',
     'array_keys' => 'Поле :attribute может содержать ограниченный список ключей.',
     'not_empty' => 'Поле :attribute не может быть пустым.',
-    'is_list' => 'Поле :attribute должно быть списком.',
 
     'computed' => 'Поле :attribute вычисляется автоматически.',
     'unchangeable' => 'Поле :attribute не может быть изменено.',
