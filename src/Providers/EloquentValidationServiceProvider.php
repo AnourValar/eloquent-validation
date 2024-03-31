@@ -24,7 +24,6 @@ class EloquentValidationServiceProvider extends ServiceProvider
     public function boot()
     {
         // validation rules
-        $this->addScalarRule();
         $this->addConfigRule();
         $this->addArrayKeysRule();
         $this->addArrayKeysOnlyRule();
@@ -43,23 +42,6 @@ class EloquentValidationServiceProvider extends ServiceProvider
                 \AnourValar\EloquentValidation\Console\Commands\ObserverMakeCommand::class,
             ]);
         }
-    }
-
-    /**
-     * @return void
-     */
-    private function addScalarRule(): void
-    {
-        \Validator::extend('scalar', function ($attribute, $value, $parameters, $validator) {
-            return (is_scalar($value) || is_null($value) || (is_object($value) && method_exists($value, '__toString')));
-        });
-
-        \Validator::replacer('scalar', function ($message, $attribute, $rule, $parameters, $validator) {
-            return trans(
-                'eloquent-validation::validation.scalar',
-                ['attribute' => $validator->getDisplayableAttribute($attribute)]
-            );
-        });
     }
 
     /**

@@ -1,7 +1,6 @@
 <?php
 
 return [
-    'scalar' => 'The :attribute must be scalar.',
     'config' => 'The :attribute attribute must contain value from directory.',
     'array_keys' => 'The :attribute attribute may contain a limited list of keys.',
     'not_empty' => 'The :attribute cannot be empty.',
