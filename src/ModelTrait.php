@@ -653,6 +653,7 @@ trait ModelTrait
                 is_array($value)
                 || (is_string($attributes[$name]) && is_integer($value) && $attributes[$name] === (string) $value)
                 || (is_string($attributes[$name]) && is_float($value) && $attributes[$name] === (string) $value)
+                || ((is_float($attributes[$name]) || is_integer($attributes[$name])) && is_string($value) && (string) $attributes[$name] === $value)
             ) {
                 $attributes[$name] = $value;
             }
