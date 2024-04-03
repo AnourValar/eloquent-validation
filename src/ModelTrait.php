@@ -643,6 +643,10 @@ trait ModelTrait
         $attributes = $this->attributes;
 
         foreach (array_keys($attributes) as $name) {
+            if (is_array($attributes[$name]) || is_object($attributes[$name])) {
+                continue;
+            }
+
             try {
                 $value = $this->getAttribute($name);
             } catch (\Carbon\Exceptions\InvalidFormatException $e) {
