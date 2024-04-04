@@ -22,7 +22,7 @@ class CrudService
         callable $mutator = null,
         $validatePrefix = null
     ): array {
-        $counters = ['deleted' => 0, 'created' => 0, 'updated' => 0];
+        $counters = ['deleted' => 0, 'created' => 0, 'updated' => 0, 'affected' => 0];
 
         if (! $model->getKeyName()) {
             throw new \LogicException('The model must have a primary key.');
@@ -42,8 +42,13 @@ class CrudService
             }
 
             $model->fields($fields);
-            $id = $query[$model->getKeyName()] ?? null;
             $currValidatePrefix = $this->validatePrefix($validatePrefix, $key);
+
+            $id = $query[$model->getKeyName()] ?? null;
+            unset($query[$model->getKeyName()]);
+
+            $delete = ! empty($query['_delete']);
+            unset($query['_delete']);
 
             if (! $id) {
                 // CREATE
@@ -54,7 +59,7 @@ class CrudService
                 }
 
                 $counters['created'] += $model->create($query)->exists ? 1 : 0;
-            } elseif (! empty($query['_delete'])) {
+            } elseif ($delete) {
                 // DELETE
                 $curr = null;
                 if (is_numeric($id)) {
@@ -91,6 +96,7 @@ class CrudService
             }
         }
 
+        $counters['affected'] = array_sum($counters);
         return $counters;
     }
 
