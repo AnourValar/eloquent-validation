@@ -602,7 +602,10 @@ trait ModelTrait
                         $rule[1][] = $this->primaryKey;
                     }
 
-                    if (! $this->isDirty($rule[1][1])) {
+                    if (
+                        (! isset($this->attributes[$rule[1][1]]) or is_scalar($this->attributes[$rule[1][1]]))
+                        && $this->originalIsEquivalent($rule[1][1])
+                    ) {
                         unset($fieldRules[$key]);
                         continue;
                     }
@@ -643,7 +646,7 @@ trait ModelTrait
         $attributes = $this->attributes;
 
         foreach (array_keys($attributes) as $name) {
-            if (is_array($attributes[$name]) || is_object($attributes[$name])) {
+            if (! is_scalar($attributes[$name]) && ! is_null($attributes[$name])) {
                 continue;
             }
 
