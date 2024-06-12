@@ -111,12 +111,12 @@ class DummyClass extends Model
      */
     protected $jsonNested = [
         '' => [
-            'jsonb' => false,
-            'nullable' => [],
-            'purges' => [],
-            'types' => [],
-            'sorts' => [],
-            'lists' => [],
+            'jsonb' => true,
+            'nullable' => ['*'],
+            'purges' => ['*'],
+            'types' => ['$.*' => 'int'],
+            'sorts' => ['$'],
+            'lists' => ['$'],
         ],
     ];
 
