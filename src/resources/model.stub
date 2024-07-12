@@ -9,7 +9,7 @@ use Illuminate\Validation\Rule;
 class DummyClass extends Model
 {
     use \AnourValar\EloquentValidation\ModelTrait;
-    //use \Illuminate\Database\Eloquent\Factories\HasFactory;
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
     //use \Illuminate\Database\Eloquent\SoftDeletes;
 
     /**
@@ -179,5 +179,86 @@ class DummyClass extends Model
     public function deleteAfterValidation(\Illuminate\Validation\Validator $validator): void
     {
 
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function model(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\App\Model::class);
+    }
+
+    /**
+     * Сортировка
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $builder
+     * @return void
+     */
+    public function scopeSort(\Illuminate\Database\Eloquent\Builder $builder) // @TODO
+    {
+        $builder
+            ->when(in_array(\Illuminate\Database\Eloquent\SoftDeletingScope::class, $builder->removedScopes()), function ($query) {
+                $query->orderBy('deleted_at', 'DESC');
+            })
+            ->orderBy('id', 'ASC');
+    }
+
+    /**
+     * Light набор полей
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $builder
+     * @return void
+     */
+    public function scopeLight(\Illuminate\Database\Eloquent\Builder $builder) // @TODO
+    {
+        $builder->select(['id', 'created_at', 'deleted_at']);
+    }
+
+    /**
+     * Heavy набор полей
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $builder
+     * @return void
+     */
+    public function scopeHeavy(\Illuminate\Database\Eloquent\Builder $builder) // @TODO
+    {
+        $builder->light() ->with(['fileVirtuals' => fn ($query) => $query->light()]);
+    }
+
+    /**
+     * ACL
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $builder
+     * @param \App\User $user
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeAcl(\Illuminate\Database\Eloquent\Builder $builder, \App\User $user = null) // @TODO
+    {
+        if (! $user) {
+            $user = \Auth::user();
+        }
+
+        return $builder;
+    }
+
+    /**
+     * @return \App\Handlers\Models\DummyClass\Type\TypeInterface
+     */
+    public function getTypeHandler(): \App\Handlers\Models\DummyClass\Type\TypeInterface
+    {
+        return \App::make($this->type_details['bind']);
+    }
+
+    /**
+     * Виртуальный атрибут: type_details
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function typeDetails(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => config("models.DummyClass.type.{$this->type}"),
+        );
     }
 }
