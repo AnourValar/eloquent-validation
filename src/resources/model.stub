@@ -84,19 +84,16 @@ class DummyClass extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
-     * @return array
+     * @var array
      */
-    protected function casts()
-    {
-        return [
-            'id' => 'integer',
+    protected $casts = [
+        'id' => 'integer',
 
-            'created_at' => 'datetime',
-            'updated_at' => 'datetime',
-        ];
-    }
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 
     /**
      * Mutators for nested JSON.
