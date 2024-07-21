@@ -823,7 +823,6 @@ trait ModelTrait
                 return $value;
             }
 
-            $value = ['$' => $value];
             $value = (new ValidatorHelper())->mutateArray(
                 $value,
                 ($rules['nullable'] ?? null),
@@ -832,7 +831,6 @@ trait ModelTrait
                 ($rules['sorts'] ?? null),
                 ($rules['lists'] ?? null)
             );
-            $value = $value['$'];
         }
 
         if (! empty($rules['jsonb'])) {

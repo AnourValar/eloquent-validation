@@ -220,7 +220,7 @@ class DummyClass extends Model
      */
     public function scopeHeavy(\Illuminate\Database\Eloquent\Builder $builder) // @TODO
     {
-        $builder->light() ->with(['fileVirtuals' => fn ($query) => $query->light()]);
+        $builder->light()->with(['fileVirtuals' => fn ($query) => $query->light()]);
     }
 
     /**

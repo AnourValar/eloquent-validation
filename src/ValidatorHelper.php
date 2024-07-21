@@ -44,23 +44,27 @@ class ValidatorHelper
      * JSON mutator: casts & sorts
      *
      * @param mixed $value
-     * @param array $nullable
-     * @param array $purges
-     * @param array $types
-     * @param array $sorts
-     * @param array $lists
+     * @param array|null $nullable
+     * @param array|null $purges
+     * @param array|null $types
+     * @param array|null $sorts
+     * @param array|null $lists
      * @param array $parentKeys
      * @return mixed
      */
     public function mutateArray(
         mixed $value,
-        ?array $nullable = null,
+        array $nullable = null,
         array $purges = null,
-        ?array $types = null,
+        array $types = null,
         array $sorts = null,
         array $lists = null,
         array $parentKeys = []
     ): mixed {
+        if (! $parentKeys) {
+            $value = ['$' => $value];
+        }
+
         if (is_array($value)) {
             foreach ($value as $key => $item) {
                 $path = array_merge($parentKeys, [$key]);
@@ -140,6 +144,10 @@ class ValidatorHelper
                     }
                 }
             }
+        }
+
+        if (! $parentKeys) {
+            $value = $value['$'];
         }
 
         return $value;
