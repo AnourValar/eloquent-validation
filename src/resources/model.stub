@@ -192,7 +192,7 @@ class DummyClass extends Model
      * @param \Illuminate\Database\Eloquent\Builder $builder
      * @return void
      */
-    public function scopeSort(\Illuminate\Database\Eloquent\Builder $builder) // @TODO
+    public function scopeSort(\Illuminate\Database\Eloquent\Builder $builder): void // @TODO
     {
         $builder
             ->when(in_array(\Illuminate\Database\Eloquent\SoftDeletingScope::class, $builder->removedScopes()), function ($query) {
@@ -207,7 +207,7 @@ class DummyClass extends Model
      * @param \Illuminate\Database\Eloquent\Builder $builder
      * @return void
      */
-    public function scopeLight(\Illuminate\Database\Eloquent\Builder $builder) // @TODO
+    public function scopeLight(\Illuminate\Database\Eloquent\Builder $builder): void // @TODO
     {
         $builder->select(['id', 'created_at', 'deleted_at']);
     }
@@ -218,7 +218,7 @@ class DummyClass extends Model
      * @param \Illuminate\Database\Eloquent\Builder $builder
      * @return void
      */
-    public function scopeHeavy(\Illuminate\Database\Eloquent\Builder $builder) // @TODO
+    public function scopeHeavy(\Illuminate\Database\Eloquent\Builder $builder): void // @TODO
     {
         $builder->light()->with(['fileVirtuals' => fn ($query) => $query->light()]);
     }
@@ -228,15 +228,13 @@ class DummyClass extends Model
      *
      * @param \Illuminate\Database\Eloquent\Builder $builder
      * @param \App\User $user
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return void
      */
-    public function scopeAcl(\Illuminate\Database\Eloquent\Builder $builder, \App\User $user = null) // @TODO
+    public function scopeAcl(\Illuminate\Database\Eloquent\Builder $builder, \App\User $user = null): void // @TODO
     {
         if (! $user) {
             $user = \Auth::user();
         }
-
-        return $builder;
     }
 
     /**

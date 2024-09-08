@@ -255,7 +255,7 @@ trait ModelTrait
      * @param mixed $ids
      * @return void
      */
-    public function scopeWithoutTrashedOr(\Illuminate\Database\Eloquent\Builder $builder, mixed $ids)
+    public function scopeWithoutTrashedOr(\Illuminate\Database\Eloquent\Builder $builder, mixed $ids): void
     {
         if (! in_array(\Illuminate\Database\Eloquent\SoftDeletes::class, class_uses($builder->getModel()))) {
             throw new \LogicException('Incorrect usage.');
@@ -304,7 +304,7 @@ trait ModelTrait
      *
      * @return void
      */
-    public function scopePublishFields()
+    public function scopePublishFields(): void
     {
         $this->visible = [];
         $this->appends = [];
@@ -317,7 +317,7 @@ trait ModelTrait
      *
      * @return void
      */
-    public function scopeAddPublishFields()
+    public function scopeAddPublishFields(): void
     {
         $args = func_get_args();
         $query = array_shift($args);
