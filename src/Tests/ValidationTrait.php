@@ -112,4 +112,26 @@ trait ValidationTrait
             }
         }
     }
+
+    /**
+     * Asserts that custom action gets validation failure
+     *
+     * @param callable $closure
+     * @param mixed $message
+     * @return void
+     */
+    protected function assertCustomValidationFailed(callable $closure, $message = true): void
+    {
+        try {
+            $closure();
+            $this->assertFalse(true);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            foreach ($e->validator->errors()->all() as $error) {
+                $this->assertStringNotContainsString('services/', $error);
+                if ($message !== true) {
+                    $this->assertEquals($message, $error);
+                }
+            }
+        }
+    }
 }
