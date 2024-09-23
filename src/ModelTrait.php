@@ -101,6 +101,26 @@ trait ModelTrait
     }
 
     /**
+     * @see \Illuminate\Database\Eloquent\Concerns\HasAttributes::originalIsEquivalent()
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    #[\Override]
+    public function originalIsEquivalent($key)
+    {
+        if (
+            isset($this->attributes[$key])
+            && isset($this->original[$key])
+            && is_subclass_of(($this->getCasts()[$key] ?? ''), \AnourValar\LaravelAtom\Mapper::class)
+        ) {
+            return json_decode($this->attributes[$key], true) === json_decode($this->original[$key], true);
+        }
+
+        return parent::originalIsEquivalent($key);
+    }
+
+    /**
      * @see \Illuminate\Database\Eloquent\Concerns\HasAttributes::asJson()
      *
      * @param  mixed  $value
@@ -109,6 +129,7 @@ trait ModelTrait
     #[\Override]
     protected function asJson($value)
     {
+        // @TODO: {"foo":"bar"} -> {"foo": "bar"} ?
         return json_encode($value, JSON_UNESCAPED_UNICODE); // for "json" columns
     }
 
