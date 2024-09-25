@@ -210,6 +210,10 @@ class ValidatorHelper
                 return false;
             }
 
+            if (is_integer($partPath)) {
+                $partPath = (string) $partPath;
+            }
+
             if ($partPath !== $partKey && $partKey !== '*') {
                 return false;
             }
