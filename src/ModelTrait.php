@@ -63,6 +63,7 @@ trait ModelTrait
             && ! strpos($key, '_min')
             && ! strpos($key, '_sum')
             && ! strpos($key, '_avg')
+            && ! strpos($key, '_fulltext')
             && ! array_key_exists($key, $this->getAttributes())
             && ! $this->hasCast($key)
             && ! $this->hasSetMutator($key)
