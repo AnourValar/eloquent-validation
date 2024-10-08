@@ -130,7 +130,7 @@ class ValidatorHelper
                         }
 
                         if ($cast) {
-                            if (in_array($cast, ['int', 'float', 'double']) && $item !== null && $item !== '' && ! is_numeric($item)) {
+                            if (in_array($cast, ['int', 'integer', 'float', 'double']) && $item !== null && $item !== '' && ! is_numeric($item)) {
                                 continue;
                             }
 
