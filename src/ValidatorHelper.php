@@ -141,7 +141,7 @@ class ValidatorHelper
                             if (mb_substr($cast, 0, 8) == 'datetime') {
                                 try {
                                     if (is_string($item) && ! is_numeric($item) && $item !== '') {
-                                        $item = \Date::parse($item)->utc()->format(mb_substr($cast, 9) ?: 'Y-m-d H:i:s');
+                                        $item = \Date::parse($item)->tz(config('app.timezone'))->format(mb_substr($cast, 9) ?: 'Y-m-d H:i:s');
                                     }
                                 } catch (\Carbon\Exceptions\InvalidFormatException $e) {
                                     // ...
