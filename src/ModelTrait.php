@@ -767,20 +767,15 @@ trait ModelTrait
      */
     protected function mutateMerge(string $attribute, $value): array
     {
-        $this->$attribute = array_merge((array) $this->$attribute, (array) $value);
-        return [$attribute => $this->getAttributes()[$attribute]];
-    }
+        if (! isset($value)) {
+            return [];
+        }
 
-    /**
-     * Diff mutator
-     *
-     * @param string $attribute
-     * @param mixed $value
-     * @return array
-     */
-    protected function mutateDiff(string $attribute, $value): array
-    {
-        $this->$attribute = array_diff((array) $this->$attribute, (array) $value);
+        if (! is_array($value)) {
+            return [$attribute => (isset($value) ? json_encode($value) : null)];
+        }
+
+        $this->$attribute = array_replace((array) $this->$attribute, $value);
         return [$attribute => $this->getAttributes()[$attribute]];
     }
 
