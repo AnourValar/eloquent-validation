@@ -110,10 +110,11 @@ trait ModelTrait
     #[\Override]
     public function originalIsEquivalent($key)
     {
+        $cast = ($this->getCasts()[$key] ?? '');
         if (
             isset($this->attributes[$key])
             && isset($this->original[$key])
-            && is_subclass_of(($this->getCasts()[$key] ?? ''), \AnourValar\LaravelAtom\Mapper::class)
+            && (is_subclass_of($cast, \AnourValar\LaravelAtom\Mapper::class) || is_subclass_of($cast, \AnourValar\LaravelAtom\MapperCollection::class))
         ) {
             return json_decode($this->attributes[$key], true) === json_decode($this->original[$key], true);
         }
