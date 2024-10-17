@@ -809,7 +809,11 @@ trait ModelTrait
      */
     private function setNull($value)
     {
-        if ((is_string($value) && trim($value) === '') || $value === []) {
+        if (
+            (is_string($value) && trim($value) === '')
+            || $value === []
+            || ($value instanceof \AnourValar\LaravelAtom\MapperCollection && ! count($value))
+        ) {
             return null;
         }
 
