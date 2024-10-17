@@ -772,7 +772,7 @@ trait ModelTrait
         }
 
         if (! is_array($value)) {
-            return [$attribute => (isset($value) ? json_encode($value) : null)];
+            return [$attribute => json_encode($value)];
         }
 
         $this->$attribute = array_replace((array) $this->$attribute, $value);
