@@ -227,10 +227,10 @@ class DummyClass extends Model
      * ACL
      *
      * @param \Illuminate\Database\Eloquent\Builder $builder
-     * @param \App\User $user
+     * @param \App\User|null $user
      * @return void
      */
-    public function scopeAcl(\Illuminate\Database\Eloquent\Builder $builder, \App\User $user = null): void // @TODO
+    public function scopeAcl(\Illuminate\Database\Eloquent\Builder $builder, ?\App\User $user = null): void // @TODO
     {
         if (! $user) {
             $user = \Auth::user();

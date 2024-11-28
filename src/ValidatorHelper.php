@@ -54,11 +54,11 @@ class ValidatorHelper
      */
     public function mutateArray(
         mixed $value,
-        array $nullable = null,
-        array $purges = null,
-        array $types = null,
-        array $sorts = null,
-        array $lists = null,
+        ?array $nullable = null,
+        ?array $purges = null,
+        ?array $types = null,
+        ?array $sorts = null,
+        ?array $lists = null,
         array $parentKeys = []
     ): mixed {
         if (! $parentKeys) {

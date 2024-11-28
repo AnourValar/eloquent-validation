@@ -12,10 +12,10 @@ trait ManyToManyTrait
      * @param \Illuminate\Database\Eloquent\Model $model
      * @param string $column
      * @param string $relation
-     * @param string $key
+     * @param string|null $key
      * @return void
      */
-    protected function onChangedM2M(Model $model, string $column, string $relation, string $key = null): void
+    protected function onChangedM2M(Model $model, string $column, string $relation, ?string $key = null): void
     {
         $sync = [];
 

@@ -10,7 +10,7 @@ class CrudService
      * @param \Illuminate\Database\Eloquent\Model $model
      * @param mixed $request
      * @param mixed $createTriggerFields
-     * @param callable $mutator
+     * @param callable|null $mutator
      * @param mixed $validatePrefix
      * @throws \LogicException
      * @return array
@@ -19,7 +19,7 @@ class CrudService
         \Illuminate\Database\Eloquent\Model $model,
         $request,
         $createTriggerFields = null,
-        callable $mutator = null,
+        ?callable $mutator = null,
         $validatePrefix = null
     ): array {
         $counters = ['deleted' => 0, 'created' => 0, 'updated' => 0, 'affected' => 0];

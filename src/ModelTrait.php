@@ -139,11 +139,11 @@ trait ModelTrait
      * Save validation
      *
      * @param mixed $prefix
-     * @param array $additionalRules
-     * @param array $additionalAttributeNames
+     * @param array|null $additionalRules
+     * @param array|null $additionalAttributeNames
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function validate($prefix = null, array $additionalRules = null, array $additionalAttributeNames = null)
+    public function validate($prefix = null, ?array $additionalRules = null, ?array $additionalAttributeNames = null)
     {
         if ($additionalAttributeNames) {
             $defaultAttributeNames = $this->getAttributeNames();
@@ -228,11 +228,11 @@ trait ModelTrait
      * Delete validation
      *
      * @param mixed $prefix
-     * @param array $additionalRules
-     * @param array $additionalAttributeNames
+     * @param array|null $additionalRules
+     * @param array|null $additionalAttributeNames
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function validateDelete($prefix = null, array $additionalRules = null, array $additionalAttributeNames = null)
+    public function validateDelete($prefix = null, ?array $additionalRules = null, ?array $additionalAttributeNames = null)
     {
         if ($additionalAttributeNames) {
             $defaultAttributeNames = $this->getAttributeNames();
@@ -375,7 +375,7 @@ trait ModelTrait
      * @param string|null $relation
      * @return \Illuminate\Support\HigherOrderTapProxy<\Illuminate\Database\Eloquent\Model>
      */
-    public function authorize($abilities, string $relation = null)
+    public function authorize($abilities, ?string $relation = null)
     {
         if (isset($abilities)) {
             $arg = $this;
