@@ -123,19 +123,6 @@ trait ModelTrait
     }
 
     /**
-     * @see \Illuminate\Database\Eloquent\Concerns\HasAttributes::asJson()
-     *
-     * @param  mixed  $value
-     * @return string
-     */
-    #[\Override]
-    protected function asJson($value)
-    {
-        // @TODO: {"foo":"bar"} -> {"foo": "bar"} ?
-        return json_encode($value, JSON_UNESCAPED_UNICODE); // for "json" columns
-    }
-
-    /**
      * Save validation
      *
      * @param mixed $prefix
@@ -772,7 +759,7 @@ trait ModelTrait
         }
 
         if (! is_array($value)) {
-            return [$attribute => json_encode($value)];
+            return [$attribute => json_encode($value, JSON_UNESCAPED_UNICODE)];
         }
 
         $this->$attribute = array_replace((array) $this->$attribute, $value);
