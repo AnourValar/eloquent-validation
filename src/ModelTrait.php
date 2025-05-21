@@ -776,16 +776,14 @@ trait ModelTrait
     {
         if (is_scalar($value) || is_null($value)) {
             $value = $mutator($value);
-        }
-
-        if (is_array($value)) {
+        } elseif (is_array($value)) {
             foreach ($value as &$item) {
                 $item = $this->mutateRecursively($item, $mutator, false);
             }
             unset($item);
         }
 
-        if ($jsonEncode) {
+        if ($jsonEncode && isset($value)) {
             $value = json_encode($value, JSON_UNESCAPED_UNICODE);
         }
 
