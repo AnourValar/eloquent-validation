@@ -768,6 +768,32 @@ trait ModelTrait
 
     /**
      * @param mixed $value
+     * @param callable $mutator
+     * @param bool $jsonEncode
+     * @return mixed
+     */
+    protected function mutateRecursively($value, callable $mutator, bool $jsonEncode = true)
+    {
+        if (is_scalar($value) || is_null($value)) {
+            $value = $mutator($value);
+        }
+
+        if (is_array($value)) {
+            foreach ($value as &$item) {
+                $item = $this->mutateRecursively($item, $mutator, false);
+            }
+            unset($item);
+        }
+
+        if ($jsonEncode) {
+            $value = json_encode($value, JSON_UNESCAPED_UNICODE);
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param mixed $value
      * @return mixed
      */
     private function setTrim($value)
