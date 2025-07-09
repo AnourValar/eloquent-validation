@@ -11,7 +11,7 @@ class ModelValidateCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'model:validate {--dirty} {--ignore-configuration}';
+    protected $signature = 'model:validate {--dirty} {--ignore-configuration} {--except=}';
 
     /**
      * The console command description.
@@ -32,6 +32,7 @@ class ModelValidateCommand extends Command
             app()->getNamespace() . $this->modelsDirectory('\\'),
             (bool) $this->modelsDirectory()
         );
+        $models = array_diff($models, explode(',', (string) $this->option('except')));
 
         $bar = $this->output->createProgressBar(count($models));
         $bar->setFormat(' %current%/%max% [%bar%] %percent:3s%% %message%');
