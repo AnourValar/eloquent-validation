@@ -67,6 +67,11 @@ class ValidatorHelper
 
         if (is_array($value)) {
             foreach ($value as $key => $item) {
+                if ($item instanceof \Illuminate\Support\Collection) {
+                    $item = $item->toArray();
+                    $value[$key] = $item;
+                }
+
                 $path = array_merge($parentKeys, [$key]);
 
                 if (is_array($item)) {
