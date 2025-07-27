@@ -27,6 +27,7 @@ class EloquentValidationServiceProvider extends ServiceProvider
         $this->addConfigRule();
         $this->addArrayKeysRule();
         $this->addArrayKeysOnlyRule();
+        $this->addArrayKeysIdRule();
         $this->addNotEmpty();
         $this->updateDefaultRules();
 
@@ -125,6 +126,37 @@ class EloquentValidationServiceProvider extends ServiceProvider
         \Validator::replacer('array_keys_only', function ($message, $attribute, $rule, $parameters, $validator) {
             return trans(
                 'eloquent-validation::validation.array_keys',
+                ['attribute' => $validator->getDisplayableAttribute($attribute)]
+            );
+        });
+    }
+
+    /**
+     * @return void
+     */
+    private function addArrayKeysIdRule(): void
+    {
+        \Validator::extend('array_keys_id', function ($attribute, $value, $parameters, $validator) {
+            $attribute .= '.';
+            foreach (array_keys($validator->getRules()) as $item) {
+                if (strpos($item, $attribute) !== 0) {
+                    continue;
+                }
+
+                $item = substr($item, strlen($attribute));
+                $item = explode('.', $item, 2);
+
+                if (! is_numeric($item[0]) || $item[0] != (int) $item[0] || $item[0] < 1) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+
+        \Validator::replacer('array_keys_id', function ($message, $attribute, $rule, $parameters, $validator) {
+            return trans(
+                'eloquent-validation::validation.array_keys_id',
                 ['attribute' => $validator->getDisplayableAttribute($attribute)]
             );
         });
