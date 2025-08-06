@@ -654,6 +654,7 @@ trait ModelTrait
     protected function getAttributesForValidation()
     {
         $attributes = $this->attributes;
+        $casts = $this->getCasts();
 
         foreach (array_keys($attributes) as $name) {
             if (! is_scalar($attributes[$name]) && ! is_null($attributes[$name])) {
@@ -671,6 +672,7 @@ trait ModelTrait
                 || (is_string($attributes[$name]) && is_integer($value) && $attributes[$name] === (string) $value)
                 || (is_string($attributes[$name]) && is_float($value) && $attributes[$name] === (string) $value)
                 || ((is_float($attributes[$name]) || is_integer($attributes[$name])) && is_string($value) && (string) $attributes[$name] === $value)
+                || in_array($casts[$name] ?? '', ['encrypted', 'encrypted:array', 'encrypted:collection', 'encrypted:object'])
             ) {
                 $attributes[$name] = $value;
             }
