@@ -127,6 +127,7 @@ trait ValidationTrait
             $this->assertFalse(true);
         } catch (\Illuminate\Validation\ValidationException $e) {
             foreach ($e->validator->errors()->all() as $error) {
+                $this->assertStringNotContainsString('::', $error);
                 $this->assertStringNotContainsString('services/', $error);
                 $this->assertStringNotContainsString('entities/', $error);
                 $this->assertStringNotContainsString('models/', $error);
