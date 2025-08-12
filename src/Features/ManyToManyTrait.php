@@ -22,7 +22,7 @@ trait ManyToManyTrait
         if ($model->exists) {
             foreach ((array) $model->$column as $name => $value) {
                 if (! is_null($key)) {
-                    $sync[] = $value[$key];
+                    $sync[] = $value[$key] ?? [];
                 } elseif (is_array($value)) {
                     $sync[] = $name;
                 } else {
