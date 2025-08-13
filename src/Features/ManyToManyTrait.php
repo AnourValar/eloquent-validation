@@ -20,9 +20,14 @@ trait ManyToManyTrait
         $sync = [];
 
         if ($model->exists) {
-            foreach ((array) $model->$column as $name => $value) {
+            $from = $model;
+            foreach (explode('.', $column) as $item) {
+                $from = $from[$item] ?? [];
+            }
+
+            foreach ($from as $name => $value) {
                 if (! is_null($key)) {
-                    $sync[] = $value[$key] ?? [];
+                    $sync[] = $value[$key];
                 } elseif (is_array($value)) {
                     $sync[] = $name;
                 } else {
