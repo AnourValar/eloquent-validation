@@ -28,9 +28,10 @@ trait ModelTrait
      * "Save" after-validation
      *
      * @param \Illuminate\Validation\Validator $validator
+     * @param bool $basic
      * @return void
      */
-    public function saveAfterValidation(\Illuminate\Validation\Validator $validator): void
+    public function saveAfterValidation(\Illuminate\Validation\Validator $validator, bool $basic): void
     {
 
     }
@@ -39,9 +40,10 @@ trait ModelTrait
      * "Delete" after-validation
      *
      * @param \Illuminate\Validation\Validator $validator
+     * @param bool $basic
      * @return void
      */
-    public function deleteAfterValidation(\Illuminate\Validation\Validator $validator): void
+    public function deleteAfterValidation(\Illuminate\Validation\Validator $validator, bool $basic): void
     {
 
     }
@@ -128,9 +130,10 @@ trait ModelTrait
      * @param mixed $prefix
      * @param array|null $additionalRules
      * @param array|null $additionalAttributeNames
+     * @param bool $basic
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function validate($prefix = null, ?array $additionalRules = null, ?array $additionalAttributeNames = null)
+    public function validate($prefix = null, ?array $additionalRules = null, ?array $additionalAttributeNames = null, bool $basic = false)
     {
         if ($additionalAttributeNames) {
             $defaultAttributeNames = $this->getAttributeNames();
@@ -153,7 +156,7 @@ trait ModelTrait
             $validator = \Validator::make($attributes, []);
             $validator->setAttributeNames($this->getAttributeNames());
 
-            $validator->after(function ($validator) {
+            $validator->after(function ($validator) use ($basic) {
                 if ($this->getComputed()) {
                     $this->handleUnchangeable($this->getComputed(), $validator, 'eloquent-validation::validation.computed');
                 }
@@ -162,7 +165,7 @@ trait ModelTrait
                     $this->handleUnchangeable($this->getUnchangeable(), $validator);
                 }
 
-                if ($this->getUnique()) {
+                if ($this->getUnique() && ! $basic) {
                     $this->handleUnique($this->getUnique(), $validator);
                 }
             });
@@ -175,13 +178,13 @@ trait ModelTrait
             $validator = \Validator::make($attributes, []);
             $validator->setAttributeNames($this->getAttributeNames());
 
-            $validator->after(function () {
+            $validator->after(function ($currValidator) use ($basic) {
                 static $triggered;
 
                 if (! $triggered) {
                     $triggered = true;
 
-                    return call_user_func_array([$this, 'saveAfterValidation'], func_get_args());
+                    return $this->saveAfterValidation($currValidator, $basic);
                 }
             });
             $passes = $validator->passes();
@@ -217,9 +220,10 @@ trait ModelTrait
      * @param mixed $prefix
      * @param array|null $additionalRules
      * @param array|null $additionalAttributeNames
+     * @param bool $basic
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function validateDelete($prefix = null, ?array $additionalRules = null, ?array $additionalAttributeNames = null)
+    public function validateDelete($prefix = null, ?array $additionalRules = null, ?array $additionalAttributeNames = null, bool $basic = false)
     {
         if ($additionalAttributeNames) {
             $defaultAttributeNames = $this->getAttributeNames();
@@ -242,7 +246,7 @@ trait ModelTrait
             $validator = \Validator::make($attributes, []);
             $validator->setAttributeNames($this->getAttributeNames());
 
-            $validator->after([$this, 'deleteAfterValidation']);
+            $validator->after(fn ($currValidator) => $this->deleteAfterValidation($currValidator, $basic));
 
             $passes = $validator->passes();
         }
