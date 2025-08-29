@@ -157,8 +157,9 @@ class ModelValidateCommand extends Command
     {
         $modelName = get_class($model);
         $collection = [];
+        $configurationAttributes = $model->extractAttributesListFromConfiguration();
 
-        foreach ($model->extractAttributesListFromConfiguration() as $name => $value) {
+        foreach ($configurationAttributes as $name => $value) {
             if (! is_array($value)) {
                 throw new \LogicException("$name is not set");
             }
@@ -240,6 +241,10 @@ class ModelValidateCommand extends Command
         $diff = array_unique(array_diff($collection, array_keys($model->getCasts()), ['pivot']));
         if ($diff) {
             throw new \LogicException('['.$modelName.'] Unrepresented attribute in the casts: ' . implode(', ', $diff));
+        }
+
+        if ($common = array_intersect($configurationAttributes['computed'], $configurationAttributes['unchangeable'])) {
+            throw new \LogicException('['.$modelName.'] Common attributes in computed and unchangeable properties: ' . implode(', ', $common));
         }
     }
 }
