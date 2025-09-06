@@ -124,7 +124,6 @@ trait ModelTrait
         return parent::originalIsEquivalent($key);
     }
 
-
     /**
      * Save pre-validation for "fill in" scenarios
      *
