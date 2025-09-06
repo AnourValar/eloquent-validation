@@ -124,6 +124,38 @@ trait ModelTrait
         return parent::originalIsEquivalent($key);
     }
 
+
+    /**
+     * Save pre-validation for "fill in" scenarios
+     *
+     * @param array $validateAttributes
+     * @param mixed $prefix
+     * @return \Illuminate\Database\Eloquent\Model
+     * @throws \LogicException
+     */
+    public function beforeValidate(array $validateAttributes, $prefix = null)
+    {
+        $rules = $this->canonizedRules();
+        if (! \App::isProduction() && array_diff_key(array_fill_keys($validateAttributes, true), $rules)) {
+            throw new \LogicException('Unexpected validate attributes.');
+        }
+
+        foreach (array_keys($rules) as $key) {
+            if (! in_array(explode('.', $key)[0], $validateAttributes)) {
+                unset($rules[$key]);
+            }
+        }
+
+        $validator = \Validator::make($this->getAttributesForValidation(), $rules);
+        $validator->setAttributeNames($this->getAttributeNames());
+
+        if (! $validator->passes()) {
+            throw new ValidationException($validator, null, 'default', $prefix);
+        }
+
+        return $this;
+    }
+
     /**
      * Save validation
      *
