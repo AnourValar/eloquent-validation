@@ -162,10 +162,15 @@ trait ModelTrait
      * @param array|null $additionalRules
      * @param array|null $additionalAttributeNames
      * @param bool $basic
+     * @param bool $skip
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function validate($prefix = null, ?array $additionalRules = null, ?array $additionalAttributeNames = null, bool $basic = false)
+    public function validate($prefix = null, ?array $additionalRules = null, ?array $additionalAttributeNames = null, bool $basic = false, bool $skip = false)
     {
+        if ($skip) {
+            return $this;
+        }
+
         if ($additionalAttributeNames) {
             $defaultAttributeNames = $this->getAttributeNames();
             $this->setAttributeNames(array_replace($defaultAttributeNames, $additionalAttributeNames));
