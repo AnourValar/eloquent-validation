@@ -708,6 +708,13 @@ trait ModelTrait
             }
 
             if (
+                $value instanceof \AnourValar\LaravelAtom\MapperCollection
+                || $value instanceof \AnourValar\LaravelAtom\Mapper
+            ) {
+                $value = $value->toArray();
+            }
+
+            if (
                 is_array($value)
                 || (is_string($attributes[$name]) && is_integer($value) && $attributes[$name] === (string) $value)
                 || (is_string($attributes[$name]) && is_float($value) && $attributes[$name] === (string) $value)
