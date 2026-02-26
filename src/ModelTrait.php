@@ -167,6 +167,11 @@ trait ModelTrait
      */
     public function validate($prefix = null, ?array $additionalRules = null, ?array $additionalAttributeNames = null, bool $basic = false, bool $skip = false)
     {
+        if (config('app.debug')) {
+            $basic = false;
+            $skip = false;
+        }
+
         if ($skip) {
             return $this;
         }
@@ -261,6 +266,10 @@ trait ModelTrait
      */
     public function validateDelete($prefix = null, ?array $additionalRules = null, ?array $additionalAttributeNames = null, bool $basic = false)
     {
+        if (config('app.debug')) {
+            $basic = false;
+        }
+
         if ($additionalAttributeNames) {
             $defaultAttributeNames = $this->getAttributeNames();
             $this->setAttributeNames(array_replace($defaultAttributeNames, $additionalAttributeNames));
