@@ -2,6 +2,7 @@ parameters:
 
     paths:
         - src
+        - tests
 
     # The level 10 is the highest level
     level: 5
@@ -11,6 +12,16 @@ parameters:
         - '#Call to static method#'
         - '#Call to an undefined method#'
         - '#is used zero times and is not analysed#'
+        - '#Access to an undefined property AnourValar\\EloquentValidation\\Tests\\Models#'
+        - '#but class Illuminate\\Support\\HigherOrderTapProxy is not generic#'
+        - '#Call to method PHPUnit\\Framework\\Assert\:\:assert#'
+        - '#AnourValar\\LaravelAtom\\Mapper#'
+        - '#Unsafe access to private property AnourValar\\EloquentValidation\\Tests\\Models#'
+        - '# on left side of \?\? is not nullable#'
+        - '#Call to function is_array\(\) with string will always evaluate to false#'
+        - '#\(void\) is used#'
+        - '#Variable \$validator might not be defined#'
+        - '#asDateTime\(\) should be#'
 
     excludePaths:
 

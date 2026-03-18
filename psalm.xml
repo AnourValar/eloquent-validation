@@ -12,6 +12,7 @@
 >
     <projectFiles>
         <directory name="src"/>
+        <directory name="tests"/>
         <ignoreFiles>
             <directory name="vendor"/>
         </ignoreFiles>
@@ -31,6 +32,22 @@
       <MissingTemplateParam errorLevel="suppress" />
       <UnsupportedPropertyReferenceUsage errorLevel="suppress" />
       <MissingOverrideAttribute errorLevel="suppress" />
+
+      <UndefinedClass>
+        <errorLevel type="suppress">
+          <file name="src/ModelTrait.php" />
+        </errorLevel>
+      </UndefinedClass>
+      <UnusedVariable>
+        <errorLevel type="suppress">
+          <file name="src/ModelTrait.php" />
+        </errorLevel>
+      </UnusedVariable>
+      <NoValue>
+        <errorLevel type="suppress">
+          <file name="src/ModelTrait.php" />
+        </errorLevel>
+      </NoValue>
     </issueHandlers>
 
     <forbiddenFunctions>

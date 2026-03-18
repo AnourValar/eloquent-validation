@@ -550,7 +550,7 @@ trait ModelTrait
         $newAttributes = $this->attributes;
 
         foreach ($unchangeable as $name) {
-            if (array_key_exists($name, $newAttributes) && ! $this->originalIsEquivalent($name, $newAttributes[$name])) {
+            if (array_key_exists($name, $newAttributes) && ! $this->originalIsEquivalent($name)) {
                 $validator->errors()->add(
                     $name,
                     trans($translate, ['attribute' => $validator->getDisplayableAttribute($name)])
@@ -685,7 +685,7 @@ trait ModelTrait
      * @see \Illuminate\Database\Eloquent\Model::asDateTime()
      *
      * @param  string  $value
-     * @return bool
+     * @return \Illuminate\Support\Carbon
      */
     #[\Override]
     protected function asDateTime($value)
