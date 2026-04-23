@@ -100,7 +100,12 @@ trait ModelTrait
             }
         }
 
-        return parent::setAttribute($key, $value);
+        try {
+            return parent::setAttribute($key, $value);
+        } catch (\TypeError $e) {
+            $this->attributes[$key] = $value;
+            return $this;
+        }
     }
 
     /**
