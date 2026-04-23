@@ -103,7 +103,7 @@ trait ModelTrait
         try {
             return parent::setAttribute($key, $value);
         } catch (\TypeError $e) {
-            $this->attributes[$key] = $value;
+            $this->attributes[$key] = is_array($value) ? json_encode($value, JSON_UNESCAPED_UNICODE) : $value;
             return $this;
         }
     }
@@ -717,7 +717,7 @@ trait ModelTrait
 
             try {
                 $value = $this->getAttribute($name);
-            } catch (\Carbon\Exceptions\InvalidFormatException $e) {
+            } catch (\Carbon\Exceptions\InvalidFormatException|\TypeError $e) {
                 $value = $attributes[$name];
             }
 
