@@ -22,6 +22,7 @@ parameters:
         - '#\(void\) is used#'
         - '#Variable \$validator might not be defined#'
         - '#asDateTime\(\) should be#'
+        - '#in isset\(\) is not nullable#'
 
     excludePaths:
 

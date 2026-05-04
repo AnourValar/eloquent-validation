@@ -103,7 +103,7 @@ trait ModelTrait
         try {
             return parent::setAttribute($key, $value);
         } catch (\TypeError $e) {
-            $this->attributes[$key] = is_array($value) ? json_encode($value, JSON_UNESCAPED_UNICODE) : $value;
+            $this->attributes[$key] = is_array($value) ? json_encode($value, JSON_UNESCAPED_UNICODE | JSON_PRESERVE_ZERO_FRACTION) : $value;
             return $this;
         }
     }
@@ -454,6 +454,21 @@ trait ModelTrait
         }
 
         return $model;
+    }
+
+    /**
+     * Get the JSON casting flags for the given attribute.
+     *
+     * @param  string  $key
+     * @return int
+     */
+    #[\Override]
+    protected function getJsonCastFlags($key)
+    {
+        $flags = parent::getJsonCastFlags($key);
+        $flags |= JSON_PRESERVE_ZERO_FRACTION;
+
+        return $flags;
     }
 
     /**
@@ -822,7 +837,7 @@ trait ModelTrait
         }
 
         if (! is_array($value)) {
-            return [$attribute => json_encode($value, JSON_UNESCAPED_UNICODE)];
+            return [$attribute => json_encode($value, JSON_UNESCAPED_UNICODE | JSON_PRESERVE_ZERO_FRACTION)];
         }
 
         $this->$attribute = array_replace((array) $this->$attribute, $value);
@@ -847,7 +862,7 @@ trait ModelTrait
         }
 
         if ($jsonEncode && isset($value)) {
-            $value = json_encode($value, JSON_UNESCAPED_UNICODE);
+            $value = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_PRESERVE_ZERO_FRACTION);
         }
 
         return $value;
