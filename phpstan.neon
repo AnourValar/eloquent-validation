@@ -11,7 +11,6 @@ parameters:
         - '#Unsafe usage of new static\(\)#'
         - '#Call to static method#'
         - '#Call to an undefined method#'
-        - '#is used zero times and is not analysed#'
         - '#Access to an undefined property AnourValar\\EloquentValidation\\Tests\\Models#'
         - '#but class Illuminate\\Support\\HigherOrderTapProxy is not generic#'
         - '#Call to method PHPUnit\\Framework\\Assert\:\:assert#'
