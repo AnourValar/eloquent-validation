@@ -145,4 +145,76 @@ class UniqueValidationTest extends AbstractSuite
         $user = \App::make(User::class);
         $this->assertDeleteValidationFailed($user, ['foo']);
     }
+
+    /**
+     * @return void
+     */
+    public function test_validateRestore_success()
+    {
+        User::query()->insert(['name' => 'John', 'email' => 'a@a.com', 'role' => 'admin']);
+        $user = User::query()->first();
+
+        // Empty restoreAfterValidation hook => validation passes
+        $this->assertSame($user, $user->validateRestore());
+    }
+
+    /**
+     * @return void
+     */
+    public function test_validateRestore_additional_rules()
+    {
+        User::query()->insert(['name' => 'John', 'email' => 'a@a.com', 'role' => 'admin']);
+        $user = User::query()->first();
+
+        try {
+            $user->validateRestore(null, ['name' => ['in:NOPE']]);
+            $this->assertTrue(false);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->assertArrayHasKey('name', $e->validator->errors()->toArray());
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function test_validateRestore_after_validation_hook()
+    {
+        $this->partialMock(User::class, function ($mock) {
+            // validateRestore must dispatch the "restore" hook, not the "delete" one
+            $mock->shouldReceive('restoreAfterValidation')->once()->andReturnUsing(function ($validator, $basic) {
+                $validator->errors()->add('foo', 'bar');
+            });
+            $mock->shouldNotReceive('deleteAfterValidation');
+        });
+
+        $user = \App::make(User::class);
+
+        try {
+            $user->validateRestore();
+            $this->assertTrue(false);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->assertArrayHasKey('foo', $e->validator->errors()->toArray());
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function test_validateCustom_dispatches_given_method()
+    {
+        $this->partialMock(User::class, function ($mock) {
+            $mock->shouldReceive('myCustomAfterValidation')->once()->andReturnUsing(function ($validator, $basic) {
+                $validator->errors()->add('foo', 'bar');
+            });
+        });
+
+        $user = \App::make(User::class);
+
+        try {
+            $user->validateCustom('myCustomAfterValidation');
+            $this->assertTrue(false);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->assertArrayHasKey('foo', $e->validator->errors()->toArray());
+        }
+    }
 }

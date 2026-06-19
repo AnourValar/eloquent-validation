@@ -49,6 +49,18 @@ trait ModelTrait
     }
 
     /**
+     * "Restore" after-validation
+     *
+     * @param \Illuminate\Validation\Validator $validator
+     * @param bool $basic
+     * @return void
+     */
+    public function restoreAfterValidation(\Illuminate\Validation\Validator $validator, bool $basic): void
+    {
+
+    }
+
+    /**
      * @see \Illuminate\Database\Eloquent\Model
      *
      * @param  string  $key
@@ -271,6 +283,35 @@ trait ModelTrait
      */
     public function validateDelete($prefix = null, ?array $additionalRules = null, ?array $additionalAttributeNames = null, bool $basic = false)
     {
+        return $this->validateCustom('deleteAfterValidation', $prefix, $additionalRules, $additionalAttributeNames, $basic);
+    }
+
+    /**
+     * Restore validation
+     *
+     * @param mixed $prefix
+     * @param array|null $additionalRules
+     * @param array|null $additionalAttributeNames
+     * @param bool $basic
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function validateRestore($prefix = null, ?array $additionalRules = null, ?array $additionalAttributeNames = null, bool $basic = false)
+    {
+        return $this->validateCustom('restoreAfterValidation', $prefix, $additionalRules, $additionalAttributeNames, $basic);
+    }
+
+    /**
+     * Custom validation
+     *
+     * @param string $afterMethod
+     * @param mixed $prefix
+     * @param array|null $additionalRules
+     * @param array|null $additionalAttributeNames
+     * @param bool $basic
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function validateCustom(string $afterMethod, $prefix = null, ?array $additionalRules = null, ?array $additionalAttributeNames = null, bool $basic = false)
+    {
         if (config('app.debug')) {
             $basic = false;
         }
@@ -296,7 +337,7 @@ trait ModelTrait
             $validator = \Validator::make($attributes, []);
             $validator->setAttributeNames($this->getAttributeNames());
 
-            $validator->after(fn ($currValidator) => $this->deleteAfterValidation($currValidator, $basic));
+            $validator->after(fn ($currValidator) => $this->$afterMethod($currValidator, $basic));
 
             $passes = $validator->passes();
         }

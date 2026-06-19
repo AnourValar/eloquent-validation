@@ -56,7 +56,7 @@ class UserPhone extends Model
 
     /**
      * Trim columns
-     * 
+     *
      * @var array
      */
     protected $trim = [
@@ -65,7 +65,7 @@ class UserPhone extends Model
 
     /**
      * '',[] => null convertation
-     * 
+     *
      * @var array
      */
     protected $nullable = [
@@ -132,6 +132,17 @@ class UserPhone extends Model
      * @return void
      */
     public function deleteAfterValidation(\Illuminate\Validation\Validator $validator): void
+    {
+        //
+    }
+
+    /**
+     * "Restore" after-validation
+     *
+     * @param \Illuminate\Validation\Validator $validator
+     * @return void
+     */
+    public function restoreAfterValidation(\Illuminate\Validation\Validator $validator): void
     {
         //
     }
