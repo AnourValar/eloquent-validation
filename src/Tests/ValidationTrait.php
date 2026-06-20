@@ -117,22 +117,29 @@ trait ValidationTrait
      * Asserts that custom action gets validation failure
      *
      * @param callable $closure
+     * @param mixed $key
      * @param mixed $message
      * @return void
      */
-    protected function assertCustomValidationFailed(callable $closure, $message = true): void
+    protected function assertCustomValidationFailed(callable $closure, $key = true, $message = true): void
     {
         try {
             $closure();
             $this->assertFalse(true);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            foreach ($e->validator->errors()->all() as $error) {
+            foreach ($e->validator->errors()->messages() as $attribute => $error) {
+                $error = $error[0];
+
                 $this->assertStringNotContainsString('::', $error);
                 $this->assertStringNotContainsString('services/', $error);
                 $this->assertStringNotContainsString('entities/', $error);
                 $this->assertStringNotContainsString('models/', $error);
                 $this->assertStringNotContainsString('controllers/', $error);
                 $this->assertStringNotContainsString('policies/', $error);
+
+                if ($key !== true) {
+                    $this->assertEquals($key, $attribute);
+                }
                 if ($message !== true) {
                     $this->assertEquals($message, $error);
                 }
