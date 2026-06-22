@@ -216,7 +216,7 @@ trait ModelTrait
 
             $validator->after(function ($validator) use ($basic) {
                 if ($this->getComputed()) {
-                    $this->handleUnchangeable($this->getComputed(), $validator, 'eloquent-validation::validation.computed');
+                    $this->handleUnchangeable($this->getComputed(), $validator, 'eloquent_validation::validation.computed');
                 }
 
                 if ($this->getUnchangeable() && $this->exists) {
@@ -602,7 +602,7 @@ trait ModelTrait
     protected function handleUnchangeable(
         array $unchangeable,
         \Illuminate\Validation\Validator &$validator,
-        $translate = 'eloquent-validation::validation.unchangeable'
+        $translate = 'eloquent_validation::validation.unchangeable'
     ) {
         if ($this->isUnguarded()) {
             return;
@@ -630,7 +630,7 @@ trait ModelTrait
     protected function handleUnique(
         array $uniques,
         \Illuminate\Validation\Validator &$validator,
-        $translate = 'eloquent-validation::validation.unique'
+        $translate = 'eloquent_validation::validation.unique'
     ) {
         $newAttributes = $this->attributes;
 

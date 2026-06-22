@@ -64,7 +64,7 @@ class ModelFeaturesTest extends AbstractSuite
         $this->assertValidationFailed(
             $account,
             ['slug'],
-            trans('eloquent-validation::validation.computed', ['attribute' => 'slug'])
+            trans('eloquent_validation::validation.computed', ['attribute' => 'slug'])
         );
     }
 
@@ -86,7 +86,7 @@ class ModelFeaturesTest extends AbstractSuite
         $this->assertValidationFailed(
             $account,
             ['email'],
-            trans('eloquent-validation::validation.unchangeable', ['attribute' => 'email'])
+            trans('eloquent_validation::validation.unchangeable', ['attribute' => 'email'])
         );
     }
 

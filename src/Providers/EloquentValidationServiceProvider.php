@@ -32,8 +32,8 @@ class EloquentValidationServiceProvider extends ServiceProvider
         $this->updateDefaultRules();
 
         // langs
-        $this->loadTranslationsFrom(__DIR__.'/../resources/lang/', 'eloquent-validation');
-        $this->publishes([__DIR__.'/../resources/lang/' => lang_path('vendor/eloquent-validation')]);
+        $this->loadTranslationsFrom(__DIR__.'/../resources/lang/', 'eloquent_validation');
+        $this->publishes([__DIR__.'/../resources/lang/' => lang_path('vendor/eloquent_validation')]);
 
         // commands
         if ($this->app->runningInConsole()) {
@@ -78,7 +78,7 @@ class EloquentValidationServiceProvider extends ServiceProvider
 
         \Validator::replacer('config', function ($message, $attribute, $rule, $parameters, $validator) {
             return trans(
-                'eloquent-validation::validation.config',
+                'eloquent_validation::validation.config',
                 ['attribute' => $validator->getDisplayableAttribute($attribute)]
             );
         });
@@ -108,7 +108,7 @@ class EloquentValidationServiceProvider extends ServiceProvider
 
         \Validator::replacer('array_keys', function ($message, $attribute, $rule, $parameters, $validator) {
             return trans(
-                'eloquent-validation::validation.array_keys',
+                'eloquent_validation::validation.array_keys',
                 ['attribute' => $validator->getDisplayableAttribute($attribute)]
             );
         });
@@ -125,7 +125,7 @@ class EloquentValidationServiceProvider extends ServiceProvider
 
         \Validator::replacer('array_keys_only', function ($message, $attribute, $rule, $parameters, $validator) {
             return trans(
-                'eloquent-validation::validation.array_keys',
+                'eloquent_validation::validation.array_keys',
                 ['attribute' => $validator->getDisplayableAttribute($attribute)]
             );
         });
@@ -156,7 +156,7 @@ class EloquentValidationServiceProvider extends ServiceProvider
 
         \Validator::replacer('array_keys_id', function ($message, $attribute, $rule, $parameters, $validator) {
             return trans(
-                'eloquent-validation::validation.array_keys_id',
+                'eloquent_validation::validation.array_keys_id',
                 ['attribute' => $validator->getDisplayableAttribute($attribute)]
             );
         });
@@ -177,7 +177,7 @@ class EloquentValidationServiceProvider extends ServiceProvider
 
         \Validator::replacer('not_empty', function ($message, $attribute, $rule, $parameters, $validator) {
             return trans(
-                'eloquent-validation::validation.not_empty',
+                'eloquent_validation::validation.not_empty',
                 ['attribute' => $validator->getDisplayableAttribute($attribute)]
             );
         });

@@ -19,7 +19,7 @@ class UniqueValidationTest extends AbstractSuite
         $this->assertValidationFailed(
             $user,
             ['email'],
-            trans('eloquent-validation::validation.unique', ['attributes' => 'email'])
+            trans('eloquent_validation::validation.unique', ['attributes' => 'email'])
         );
 
         // unique email => ok
@@ -85,7 +85,7 @@ class UniqueValidationTest extends AbstractSuite
         $this->assertValidationFailed(
             $user,
             ['email'],
-            trans('eloquent-validation::validation.unchangeable', ['attribute' => 'email'])
+            trans('eloquent_validation::validation.unchangeable', ['attribute' => 'email'])
         );
     }
 

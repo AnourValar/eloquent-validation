@@ -46,7 +46,7 @@ class ValidationRulesTest extends AbstractSuite
         $validator = \Validator::make(['status' => 'missing'], ['status' => 'config:my_directory']);
         $this->assertFalse($validator->passes());
         $this->assertSame(
-            trans('eloquent-validation::validation.config', ['attribute' => 'status']),
+            trans('eloquent_validation::validation.config', ['attribute' => 'status']),
             $validator->errors()->first('status')
         );
     }
@@ -125,7 +125,7 @@ class ValidationRulesTest extends AbstractSuite
         $validator = \Validator::make(['x' => ''], ['x' => 'not_empty']);
         $this->assertFalse($validator->passes());
         $this->assertSame(
-            trans('eloquent-validation::validation.not_empty', ['attribute' => 'x']),
+            trans('eloquent_validation::validation.not_empty', ['attribute' => 'x']),
             $validator->errors()->first('x')
         );
     }
