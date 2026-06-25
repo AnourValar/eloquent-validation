@@ -135,6 +135,10 @@ trait ValidationTrait
                 $this->assertStringNotContainsString('entities/', $error);
                 $this->assertStringNotContainsString('models/', $error);
                 $this->assertStringNotContainsString('controllers/', $error);
+                $this->assertStringNotContainsString('handlers/', $error);
+                $this->assertStringNotContainsString('notifications/', $error);
+                $this->assertStringNotContainsString('requests/', $error);
+                $this->assertStringNotContainsString('instance/', $error);
                 $this->assertStringNotContainsString('policies/', $error);
 
                 if ($key !== true) {
