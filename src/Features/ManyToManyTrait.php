@@ -4,7 +4,7 @@ namespace AnourValar\EloquentValidation\Features;
 
 use Illuminate\Database\Eloquent\Model;
 
-trait ManyToManyTrait
+trait ManyToManyTrait // @deprecated
 {
     /**
      * On saved & deleted events

@@ -42,11 +42,17 @@ abstract class AbstractSuite extends \Orchestra\Testbench\TestCase
             $table->string('name');
             $table->string('email');
             $table->string('role')->nullable();
+            $table->json('tag_ids')->nullable();
         });
 
         Schema::create('tags', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title');
+        });
+
+        Schema::create('directories', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('title')->nullable();
         });
 
         Schema::create('articles', function (Blueprint $table) {

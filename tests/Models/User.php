@@ -2,9 +2,14 @@
 
 namespace AnourValar\EloquentValidation\Tests\Models;
 
+/**
+ * @property int $id
+ * @property array<int, int>|null $tag_ids
+ */
 class User extends \Illuminate\Database\Eloquent\Model
 {
     use \AnourValar\EloquentValidation\ModelTrait;
+    use \AnourValar\EloquentValidation\Features\JsonRelations;
 
     /**
      * @var bool
@@ -27,7 +32,7 @@ class User extends \Illuminate\Database\Eloquent\Model
     /**
      * @var array<int, string>
      */
-    protected $fillable = ['name', 'email', 'role'];
+    protected $fillable = ['name', 'email', 'role', 'tag_ids'];
 
     /**
      * @var array
@@ -37,6 +42,7 @@ class User extends \Illuminate\Database\Eloquent\Model
         'name' => 'string',
         'email' => 'string',
         'role' => 'string',
+        'tag_ids' => 'array',
     ];
 
     /**
@@ -48,6 +54,17 @@ class User extends \Illuminate\Database\Eloquent\Model
             'name' => ['required', 'string'],
             'email' => ['required', 'string'],
             'role' => ['nullable', 'string'],
+            'tag_ids' => ['nullable', 'array'],
         ];
+    }
+
+    /**
+     * Many-to-many relation backed by the JSON "tag_ids" list (no pivot table).
+     *
+     * @return \AnourValar\EloquentValidation\Features\Relations\BelongsToJson
+     */
+    public function directories(): \AnourValar\EloquentValidation\Features\Relations\BelongsToJson
+    {
+        return $this->belongsToJson(Directory::class, 'tag_ids');
     }
 }
