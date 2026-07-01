@@ -126,7 +126,7 @@ class BelongsToJson extends Relation
     }
 
     /**
-     * Add the constraints for an internal relationship existence query (JSON array containment).
+     * Add the constraints for an internal relationship existence query (JSONB containment).
      *
      * @param \Illuminate\Database\Eloquent\Builder<TRelatedModel> $query
      * @param \Illuminate\Database\Eloquent\Builder<TDeclaringModel> $parentQuery
